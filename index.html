@@ -1,0 +1,2662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global E-Visa & Immigration Portal</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js via CDN for Admin Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            civic: {
+              950: '#071120',
+              900: '#0f1e36',
+              800: '#162c4e',
+              700: '#1e3c68',
+              600: '#254f8a',
+              500: '#2f66b3',
+              100: '#e8effa',
+              50: '#f4f7fc'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Custom scrollbar & subtle utility styles */
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      overflow-x: hidden;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Custom subtle scrollbars */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes pulseScan {
+      0% { transform: translateY(0%); opacity: 0.25; }
+      50% { transform: translateY(100%); opacity: 0.9; }
+      100% { transform: translateY(0%); opacity: 0.25; }
+    }
+    .ocr-scan-bar {
+      animation: pulseScan 2.2s ease-in-out infinite;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #ffffff !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+
+  <!-- Toast Notification Container (replaces alert()) -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full px-4 sm:px-0 pointer-events-none no-print"></div>
+
+  <!-- Top Official Civic Navigation Header -->
+  <header class="sticky top-0 z-40 bg-civic-950 text-white border-b border-civic-800 shadow-md no-print">
+    <!-- Top Utility Strip -->
+    <div class="bg-civic-900/90 border-b border-white/10 text-xs text-slate-300">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Official Border &amp; Consular E-Visa Services • Encrypted Portal v4.2</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="hidden sm:inline text-slate-400">24/7 Consular Desk: +1 (800) 555-0194</span>
+          <button onclick="switchView('assistant')" class="text-sky-300 hover:text-white underline underline-offset-2 font-medium transition">
+            AI Visa Helpdesk
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navbar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-3">
+        <!-- Brand Logo -->
+        <button onclick="switchView('home')" class="flex items-center gap-3 text-left group focus:outline-none">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-civic-600 flex items-center justify-center shadow-lg shadow-sky-950/50 ring-1 ring-white/20 group-hover:scale-105 transition">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <div class="font-bold text-base sm:text-lg tracking-tight leading-none text-white">E– Visa<span class="text-sky-400"> Immigration System</span></div>
+            <div class="text-[11px] text-slate-400 tracking-wide mt-0.5">Immigration &amp; Border Clearance</div>
+          </div>
+        </button>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden lg:flex items-center gap-1">
+          <button data-nav="home" onclick="switchView('home')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-white/10 hover:text-white transition">
+            Overview
+          </button>
+          <button data-nav="apply" onclick="switchView('apply')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-white/10 hover:text-white transition">
+            Apply for E-Visa
+          </button>
+          <button data-nav="track" onclick="switchView('track')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-white/10 hover:text-white transition">
+            Track Application
+          </button>
+          <button data-nav="admin" onclick="handleAdminNavClick()" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-white/10 hover:text-white transition flex items-center gap-1.5">
+            <span>Admin Portal</span>
+            <span class="px-1.5 py-0.5 text-[10px] font-semibold uppercase rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">Officer</span>
+          </button>
+          <button data-nav="assistant" onclick="switchView('assistant')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-slate-200 hover:bg-white/10 hover:text-white transition flex items-center gap-1.5">
+            <span>AI Assistant</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          </button>
+        </nav>
+
+        <!-- Session / Auth Controls -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div id="sessionBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs">
+            <span id="sessionDot" class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <span id="sessionUserText" class="text-slate-200 font-medium">Guest</span>
+            <span id="sessionRolePill" class="px-1.5 py-0.5 rounded text-[10px] uppercase font-semibold bg-slate-700 text-slate-200">Visitor</span>
+          </div>
+
+          <button id="authActionBtn" onclick="openAuthModal()" class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-sky-500 hover:bg-sky-400 text-slate-950 shadow transition">
+            Sign In / Register
+          </button>
+
+          <!-- Mobile Hamburger -->
+          <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-lg text-slate-200 hover:bg-white/10 transition" aria-label="Toggle Menu">
+            <svg id="mobileMenuIconOpen" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="mobileMenuIconClose" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Menu -->
+    <div id="mobileMenu" class="lg:hidden hidden bg-civic-900 border-t border-white/10 px-4 py-3 space-y-1">
+      <div id="mobileSessionBar" class="flex items-center justify-between px-3 py-2 mb-2 rounded-lg bg-white/5 text-xs text-slate-300">
+        <span id="mobileSessionText">Signed in as Guest</span>
+        <span id="mobileSessionRole" class="px-2 py-0.5 rounded bg-slate-800 text-sky-300 font-semibold">Visitor</span>
+      </div>
+      <button onclick="switchView('home'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-slate-100 hover:bg-white/10">Overview &amp; Visa Categories</button>
+      <button onclick="switchView('apply'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-slate-100 hover:bg-white/10">Online E-Visa Application &amp; OCR</button>
+      <button onclick="switchView('track'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-slate-100 hover:bg-white/10">Track Application Status</button>
+      <button onclick="handleAdminNavClick(); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-amber-300 hover:bg-white/10">Immigration Admin Dashboard</button>
+      <button onclick="switchView('assistant'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-sky-300 hover:bg-white/10">AI Visa Assistant</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1">
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 1: HOME / OVERVIEW PORTAL                                        -->
+    <!-- ===================================================================== -->
+    <section id="view-home" class="app-view">
+      <!-- Hero Banner -->
+      <div class="bg-gradient-to-br from-civic-950 via-civic-900 to-civic-800 text-white border-b border-civic-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            <div class="lg:col-span-7 space-y-5">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-400/30 text-sky-300 text-xs font-semibold tracking-wide">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <span>Biometric OCR Verification &amp; Real-Time Consular Tracking</span>
+              </div>
+
+              <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+                Fast, Transparent &amp; Secure <span class="text-sky-400">Electronic Visa</span> Processing
+              </h1>
+
+              <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
+                Apply online for Tourist, Student, Business, or Medical visas. Automated MRZ/OCR passport extraction, live status milestones, officer review workflows, and 24/7 AI visa guidance in one unified portal.
+              </p>
+
+              <div class="flex flex-wrap items-center gap-3 pt-1">
+                <button onclick="switchView('apply')" class="px-5 py-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-sm sm:text-base shadow-lg shadow-sky-950/50 transition flex items-center gap-2">
+                  <span>Start E-Visa Application</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </button>
+                <button onclick="switchView('track')" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white font-semibold text-sm sm:text-base transition">
+                  Track Application ID
+                </button>
+                <button onclick="switchView('assistant')" class="px-4 py-3 rounded-xl bg-civic-800/80 hover:bg-civic-700 border border-sky-400/25 text-sky-200 font-medium text-sm transition">
+                  Ask AI Visa Assistant
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick Status Lookup Card inside Hero -->
+            <div class="lg:col-span-5">
+              <div class="bg-white text-slate-900 rounded-2xl p-5 sm:p-6 shadow-2xl border border-slate-200">
+                <div class="flex items-center justify-between mb-3">
+                  <h2 class="font-bold text-base sm:text-lg text-civic-950">Instant Application Tracker</h2>
+                  <span class="text-xs font-mono-code px-2 py-0.5 rounded bg-civic-50 text-civic-700 border border-civic-100">LIVE STATUS</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-600 mb-4">Enter your Application ID to view current adjudication stage, officer remarks, and timeline.</p>
+
+                <form onsubmit="quickTrackSubmit(event)" class="space-y-3">
+                  <div>
+                    <label for="heroTrackInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Application ID</label>
+                    <div class="flex gap-2">
+                      <input id="heroTrackInput" type="text" placeholder="e.g. EV-2026-8492" class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 font-mono-code text-sm uppercase outline-none" />
+                      <button type="submit" class="px-4 py-2.5 rounded-xl bg-civic-900 hover:bg-civic-800 text-white font-semibold text-sm transition shrink-0">
+                        Track
+                      </button>
+                    </div>
+                  </div>
+                </form>
+
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                  <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Sample Application IDs:</div>
+                  <div class="flex flex-wrap gap-1.5" id="heroSampleIds"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visa Categories Grid -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-civic-600">Eligible Visa Classes</span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-civic-950 mt-1">Select Your Purpose of Travel</h2>
+          </div>
+          <p class="text-sm text-slate-600 max-w-md">Fees, validity windows, and mandatory supporting documents automatically adapt to your chosen visa class.</p>
+        </div>
+
+        <div id="visaCategoryCards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+
+        <!-- 5 Core Portal Capabilities Strip -->
+        <div class="mt-14 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div class="mb-6">
+            <h3 class="text-xl font-bold text-civic-950">Integrated Immigration Architecture</h3>
+            <p class="text-sm text-slate-600 mt-1">End-to-end digital workflows from applicant OCR intake to consular decisioning.</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <div class="text-xs font-bold text-civic-700 uppercase mb-1">01 • E-Visa Form</div>
+              <div class="font-semibold text-sm text-slate-900 mb-1">4-Step Guided Filing</div>
+              <p class="text-xs text-slate-600">Account session management, dynamic visa rules, validation, and instant ID assignment.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <div class="text-xs font-bold text-civic-700 uppercase mb-1">02 • Doc &amp; OCR</div>
+              <div class="font-semibold text-sm text-slate-900 mb-1">Automated Extraction</div>
+              <p class="text-xs text-slate-600">Passport, photo &amp; supporting uploads with simulated MRZ/OCR field parsing &amp; confidence score.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <div class="text-xs font-bold text-civic-700 uppercase mb-1">03 • Live Tracking</div>
+              <div class="font-semibold text-sm text-slate-900 mb-1">Milestone Timeline</div>
+              <p class="text-xs text-slate-600">Real-time Pending, Under Review, Approved, or Rejected status with printable E-Visa pass.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <div class="text-xs font-bold text-civic-700 uppercase mb-1">04 • Admin Console</div>
+              <div class="font-semibold text-sm text-slate-900 mb-1">Officer Adjudication</div>
+              <p class="text-xs text-slate-600">Analytics charts, filterable applicant queue, OCR inspection, remarks, and instant decisions.</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <div class="text-xs font-bold text-civic-700 uppercase mb-1">05 • AI Assistant</div>
+              <div class="font-semibold text-sm text-slate-900 mb-1">Consular Guidance</div>
+              <p class="text-xs text-slate-600">Country rules, checklists, FAQs, and interactive step-by-step application help.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 2: MULTI-STEP E-VISA APPLICATION + DOCUMENT & OCR VERIFICATION   -->
+    <!-- ===================================================================== -->
+    <section id="view-apply" class="app-view hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <!-- Header & Quick Demo Fill -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-civic-600">
+              <span>Module 01 &amp; 02</span>
+              <span>•</span>
+              <span>Online Application &amp; OCR Verification</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-civic-950 mt-1">Electronic Visa Application</h1>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="fillSampleApplicationData()" class="px-3.5 py-2 rounded-xl bg-civic-50 hover:bg-civic-100 text-civic-800 border border-civic-200 text-xs sm:text-sm font-semibold transition">
+              Auto-Fill Sample Applicant
+            </button>
+            <button type="button" onclick="resetApplicationForm()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs sm:text-sm font-medium transition">
+              Clear Form
+            </button>
+          </div>
+        </div>
+
+        <!-- Stepper Progress Bar -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 mb-6 shadow-sm">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4" id="stepIndicatorGrid">
+            <!-- Populated dynamically via JS -->
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full mt-4 overflow-hidden">
+            <div id="stepProgressBar" class="h-full bg-civic-600 transition-all duration-300" style="width: 25%;"></div>
+          </div>
+        </div>
+
+        <!-- Application Layout: Main Form (8 cols) + Live Summary Sidebar (4 cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 sm:p-8 shadow-sm">
+            <form id="evisaForm" onsubmit="submitEvisaApplication(event)" novalidate>
+
+              <!-- STEP 1: Personal & Passport Information -->
+              <div id="form-step-1" class="form-step space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                  <h2 class="text-xl font-bold text-civic-950">Step 1: Personal &amp; Passport Details</h2>
+                  <p class="text-sm text-slate-600 mt-0.5">Enter biographical details exactly as printed on your machine-readable passport.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Full Name (Given + Surname) *</label>
+                    <input id="appFullName" type="text" required placeholder="e.g. Aarav Mehta" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" oninput="updateLiveSummary()" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appFullName">Full name is required.</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Email Address (For Status Alerts) *</label>
+                    <input id="appEmail" type="email" required placeholder="aarav.mehta@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appEmail">Valid email address is required.</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Nationality / Country of Citizenship *</label>
+                    <input id="appNationality" type="text" required placeholder="e.g. India" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" oninput="updateLiveSummary()" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appNationality">Nationality is required.</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Passport Number *</label>
+                    <input id="appPassportNo" type="text" required placeholder="e.g. Z8492014" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm font-mono-code uppercase outline-none" oninput="updateLiveSummary()" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appPassportNo">Passport number is required (min 5 characters).</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Date of Birth *</label>
+                    <input id="appDob" type="date" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appDob">Date of birth is required.</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Passport Expiry Date *</label>
+                    <input id="appPassportExpiry" type="date" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appPassportExpiry">Passport expiry date is required.</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Phone Number</label>
+                    <input id="appPhone" type="tel" placeholder="+91 98250 11223" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" />
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Current Country of Residence *</label>
+                    <input id="appResidence" type="text" required placeholder="e.g. India" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appResidence">Country of residence is required.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- STEP 2: Visa Type & Travel / Sponsor Details -->
+              <div id="form-step-2" class="form-step hidden space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                  <h2 class="text-xl font-bold text-civic-950">Step 2: Visa Category &amp; Travel / Sponsor Details</h2>
+                  <p class="text-sm text-slate-600 mt-0.5">Choose your visa type to view dynamic validity, fee, and sponsor/institution fields.</p>
+                </div>
+
+                <!-- Visa Type Selector Cards -->
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2.5">Select E-Visa Category *</label>
+                  <div id="visaSelectorGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+
+                <!-- Dynamic Visa Rules Callout -->
+                <div id="dynamicVisaMetaBox" class="p-4 rounded-xl bg-civic-50 border border-civic-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div id="metaVisaTitle" class="font-bold text-sm text-civic-950">Tourist E-Visa</div>
+                    <div id="metaVisaDesc" class="text-xs text-civic-700 mt-0.5">Leisure travel, sightseeing, and visiting family/friends.</div>
+                  </div>
+                  <div class="flex items-center gap-4 shrink-0 text-right">
+                    <div>
+                      <div class="text-[11px] uppercase text-slate-500 font-semibold">Validity</div>
+                      <div id="metaVisaValidity" class="text-sm font-bold text-civic-950">90 Days</div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] uppercase text-slate-500 font-semibold">Visa Fee</div>
+                      <div id="metaVisaFee" class="text-base font-extrabold text-emerald-700">$80 USD</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Destination Country / Jurisdiction *</label>
+                    <select id="appDestination" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm bg-white outline-none" onchange="updateLiveSummary()">
+                      <option value="United States">United States</option>
+                      <option value="United Kingdom">United Kingdom</option>
+                      <option value="Schengen Area (EU)">Schengen Area (EU)</option>
+                      <option value="India">India</option>
+                      <option value="United Arab Emirates">United Arab Emirates</option>
+                      <option value="Canada">Canada</option>
+                      <option value="Japan">Japan</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Expected Arrival Date *</label>
+                    <input id="appArrivalDate" type="date" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" onchange="updateLiveSummary()" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appArrivalDate">Expected arrival date is required.</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Intended Duration of Stay (Days) *</label>
+                    <input id="appStayDays" type="number" min="1" max="365" value="15" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" />
+                  </div>
+
+                  <div>
+                    <label id="sponsorLabel" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Accommodation / Host / Sponsor Name *</label>
+                    <input id="appSponsor" type="text" required placeholder="e.g. Grand Horizon Hotel or Host Name" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" />
+                    <p class="text-xs text-rose-600 mt-1 hidden" data-err="appSponsor">Sponsor or accommodation details are required.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">Travel Itinerary / Purpose Summary *</label>
+                  <textarea id="appPurpose" rows="3" required placeholder="Provide concise details of your travel itinerary, conference/university/hospital, or purpose of entry..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none"></textarea>
+                  <p class="text-xs text-rose-600 mt-1 hidden" data-err="appPurpose">Purpose summary is required.</p>
+                </div>
+              </div>
+
+              <!-- STEP 3: Document Upload & Simulated OCR Extraction -->
+              <div id="form-step-3" class="form-step hidden space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div>
+                    <h2 class="text-xl font-bold text-civic-950">Step 3: Document Verification &amp; OCR Scan</h2>
+                    <p class="text-sm text-slate-600 mt-0.5">Upload required documents or trigger a simulated OCR passport extraction to verify fields.</p>
+                  </div>
+                  <button type="button" onclick="runSimulatedOcrScan()" class="px-4 py-2.5 rounded-xl bg-civic-900 hover:bg-civic-800 text-white text-xs sm:text-sm font-semibold shadow flex items-center gap-2 transition shrink-0">
+                    <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 7v-1a2 2 0 012-2h2M4 17v1a2 2 0 002 2h2m8-16h2a2 2 0 012 2v1m0 12v1a2 2 0 01-2 2h-2M7 12h10" />
+                    </svg>
+                    <span>Run Sample OCR Scan</span>
+                  </button>
+                </div>
+
+                <!-- Dynamic Checklist Banner for Selected Visa Type -->
+                <div class="p-4 rounded-xl bg-amber-50/80 border border-amber-200">
+                  <div class="text-xs font-bold uppercase tracking-wider text-amber-900 mb-1.5">Required Checklist for <span id="checklistVisaName">Tourist Visa</span>:</div>
+                  <ul id="checklistItems" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-amber-950"></ul>
+                </div>
+
+                <!-- 3 Upload Zones: Passport, Photo, Supporting Docs -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <!-- Passport Upload -->
+                  <div id="dropzone-passport" ondragover="handleDragOver(event, 'passport')" ondragleave="handleDragLeave('passport')" ondrop="handleDrop(event, 'passport')" class="border-2 border-dashed border-slate-300 hover:border-civic-500 rounded-2xl p-4 text-center bg-slate-50/70 transition flex flex-col justify-between">
+                    <div>
+                      <div class="w-10 h-10 rounded-xl bg-civic-100 text-civic-700 flex items-center justify-center mx-auto mb-2.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                        </svg>
+                      </div>
+                      <div class="font-bold text-sm text-slate-900">Passport Bio Page *</div>
+                      <p class="text-[11px] text-slate-500 mt-1">PDF, JPG, PNG • Drag &amp; drop or browse</p>
+                    </div>
+                    <div id="preview-passport" class="mt-3 text-xs font-mono-code text-slate-600 bg-white rounded-lg p-2 border border-slate-200 truncate">No file uploaded</div>
+                    <label class="mt-3 cursor-pointer inline-flex justify-center items-center px-3 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 transition">
+                      <span>Choose Passport</span>
+                      <input type="file" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="handleFileSelect(event, 'passport')" />
+                    </label>
+                  </div>
+
+                  <!-- Photograph Upload -->
+                  <div id="dropzone-photo" ondragover="handleDragOver(event, 'photo')" ondragleave="handleDragLeave('photo')" ondrop="handleDrop(event, 'photo')" class="border-2 border-dashed border-slate-300 hover:border-civic-500 rounded-2xl p-4 text-center bg-slate-50/70 transition flex flex-col justify-between">
+                    <div>
+                      <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center mx-auto mb-2.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div class="font-bold text-sm text-slate-900">Applicant Photo *</div>
+                      <p class="text-[11px] text-slate-500 mt-1">Plain light background • JPG/PNG</p>
+                    </div>
+                    <div id="preview-photo" class="mt-3 text-xs font-mono-code text-slate-600 bg-white rounded-lg p-2 border border-slate-200 truncate">No file uploaded</div>
+                    <label class="mt-3 cursor-pointer inline-flex justify-center items-center px-3 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 transition">
+                      <span>Choose Photo</span>
+                      <input type="file" accept=".jpg,.jpeg,.png" class="hidden" onchange="handleFileSelect(event, 'photo')" />
+                    </label>
+                  </div>
+
+                  <!-- Supporting Documents Upload -->
+                  <div id="dropzone-supporting" ondragover="handleDragOver(event, 'supporting')" ondragleave="handleDragLeave('supporting')" ondrop="handleDrop(event, 'supporting')" class="border-2 border-dashed border-slate-300 hover:border-civic-500 rounded-2xl p-4 text-center bg-slate-50/70 transition flex flex-col justify-between">
+                    <div>
+                      <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-2.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div id="supportingDocTitle" class="font-bold text-sm text-slate-900">Supporting Doc *</div>
+                      <p id="supportingDocHint" class="text-[11px] text-slate-500 mt-1">Itinerary, invite, admission, or medical letter</p>
+                    </div>
+                    <div id="preview-supporting" class="mt-3 text-xs font-mono-code text-slate-600 bg-white rounded-lg p-2 border border-slate-200 truncate">No file uploaded</div>
+                    <label class="mt-3 cursor-pointer inline-flex justify-center items-center px-3 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 transition">
+                      <span>Choose Document</span>
+                      <input type="file" accept=".pdf,.jpg,.jpeg,.png" class="hidden" onchange="handleFileSelect(event, 'supporting')" />
+                    </label>
+                  </div>
+                </div>
+
+                <!-- OCR Extraction Results Panel -->
+                <div class="relative rounded-2xl border border-civic-200 bg-gradient-to-br from-slate-900 to-civic-950 text-white p-5 overflow-hidden">
+                  <div id="ocrScanningOverlay" class="hidden absolute inset-0 bg-civic-950/90 z-10 flex flex-col items-center justify-center gap-2">
+                    <div class="w-full max-w-xs h-1 bg-slate-800 rounded-full overflow-hidden">
+                      <div class="h-full w-1/2 bg-sky-400 ocr-scan-bar"></div>
+                    </div>
+                    <div class="text-xs font-mono-code text-sky-300">Scanning MRZ &amp; Optical Fields...</div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-400/30 font-mono-code text-xs font-semibold">OCR ENGINE</span>
+                      <h3 class="font-bold text-sm sm:text-base">Extracted Passport &amp; Document Data</h3>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span id="ocrConfidenceBadge" class="px-2.5 py-1 rounded-full text-xs font-mono-code bg-slate-800 text-slate-300 border border-white/10">Awaiting Scan</span>
+                      <button type="button" onclick="applyOcrToFormFields()" class="px-3 py-1 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-bold transition">
+                        Sync to Step 1
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                      <div class="text-slate-400 uppercase text-[10px] font-semibold">Extracted Full Name</div>
+                      <div id="ocrFieldName" class="font-mono-code text-sm text-white mt-0.5">—</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                      <div class="text-slate-400 uppercase text-[10px] font-semibold">Passport Number</div>
+                      <div id="ocrFieldPassport" class="font-mono-code text-sm text-sky-300 mt-0.5">—</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                      <div class="text-slate-400 uppercase text-[10px] font-semibold">Nationality</div>
+                      <div id="ocrFieldNationality" class="font-mono-code text-sm text-white mt-0.5">—</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                      <div class="text-slate-400 uppercase text-[10px] font-semibold">Date of Birth</div>
+                      <div id="ocrFieldDob" class="font-mono-code text-sm text-white mt-0.5">—</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                      <div class="text-slate-400 uppercase text-[10px] font-semibold">Passport Expiry</div>
+                      <div id="ocrFieldExpiry" class="font-mono-code text-sm text-emerald-300 mt-0.5">—</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                      <div class="text-slate-400 uppercase text-[10px] font-semibold">MRZ Line Checksum</div>
+                      <div id="ocrFieldMrz" class="font-mono-code text-xs text-amber-300 mt-1 truncate">P&lt;INDMEHTA&lt;&lt;AARAV&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- STEP 4: Review & Submit -->
+              <div id="form-step-4" class="form-step hidden space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                  <h2 class="text-xl font-bold text-civic-950">Step 4: Review &amp; Official Declaration</h2>
+                  <p class="text-sm text-slate-600 mt-0.5">Verify all information before generating your Application ID and submitting for consular review.</p>
+                </div>
+
+                <div id="reviewSummaryCard" class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5 space-y-4 text-sm">
+                  <!-- Dynamically rendered review details -->
+                </div>
+
+                <label class="flex items-start gap-3 p-4 rounded-xl border border-slate-200 bg-white cursor-pointer select-none">
+                  <input id="appDeclaration" type="checkbox" class="mt-1 w-4 h-4 rounded text-civic-600 focus:ring-civic-500" />
+                  <span class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                    I hereby declare that all details, travel intentions, and uploaded documents provided in this electronic visa application are true, accurate, and complete to the best of my knowledge. False statements may result in immediate refusal or entry ban.
+                  </span>
+                </label>
+                <p class="text-xs text-rose-600 hidden" data-err="appDeclaration">You must accept the declaration before submitting.</p>
+              </div>
+
+              <!-- Navigation Buttons for Multi-Step Form -->
+              <div class="mt-8 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                <button type="button" id="prevStepBtn" onclick="changeFormStep(-1)" class="px-5 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm transition hidden">
+                  ← Previous Step
+                </button>
+                <div class="ml-auto flex items-center gap-3">
+                  <button type="button" id="nextStepBtn" onclick="changeFormStep(1)" class="px-6 py-2.5 rounded-xl bg-civic-900 hover:bg-civic-800 text-white font-semibold text-sm shadow transition">
+                    Continue to Next Step →
+                  </button>
+                  <button type="submit" id="submitAppBtn" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-900/20 transition hidden">
+                    Submit E-Visa Application
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right Sticky Summary Sidebar -->
+          <aside class="lg:col-span-4 space-y-5">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Application Snapshot</div>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between gap-2">
+                  <span class="text-slate-500">Applicant</span>
+                  <span id="sumName" class="font-semibold text-slate-900 text-right">—</span>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <span class="text-slate-500">Passport</span>
+                  <span id="sumPassport" class="font-mono-code font-semibold text-slate-900 text-right">—</span>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <span class="text-slate-500">Visa Category</span>
+                  <span id="sumVisaType" class="font-semibold text-civic-700 text-right">Tourist Visa</span>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <span class="text-slate-500">Destination</span>
+                  <span id="sumDestination" class="font-semibold text-slate-900 text-right">United States</span>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <span class="text-slate-500">Arrival Date</span>
+                  <span id="sumArrival" class="font-semibold text-slate-900 text-right">—</span>
+                </div>
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <span class="font-semibold text-slate-700">Estimated Fee</span>
+                  <span id="sumFee" class="text-lg font-extrabold text-civic-950">$80 USD</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-civic-50 rounded-2xl border border-civic-200 p-5">
+              <div class="flex items-center gap-2 text-civic-900 font-bold text-sm mb-2">
+                <svg class="w-4 h-4 text-civic-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Need Help With Requirements?</span>
+              </div>
+              <p class="text-xs text-civic-800 leading-relaxed mb-3">
+                Unsure about passport validity rules, sponsor letters, or medical visa documentation? Ask our AI Visa Assistant.
+              </p>
+              <button type="button" onclick="switchView('assistant')" class="w-full py-2 px-3 rounded-xl bg-civic-900 hover:bg-civic-800 text-white text-xs font-semibold transition">
+                Open AI Visa Assistant
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 3: VISA APPLICATION TRACKING & TIMELINE                          -->
+    <!-- ===================================================================== -->
+    <section id="view-track" class="app-view hidden">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div class="mb-6">
+          <span class="text-xs font-bold uppercase tracking-wider text-civic-600">Module 03 • Real-Time Status</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-civic-950 mt-1">Track Your E-Visa Application</h1>
+          <p class="text-sm text-slate-600 mt-1">Inspect application status, officer review notes, milestone timeline, and E-Visa approval pass.</p>
+        </div>
+
+        <!-- Search & Quick Sample Selector -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm mb-6 no-print">
+          <form onsubmit="handleTrackSearchSubmit(event)" class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+              <input id="trackSearchInput" type="text" placeholder="Enter Application ID (e.g. EV-2026-8492)" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 font-mono-code text-sm sm:text-base uppercase outline-none" />
+            </div>
+            <button type="submit" class="px-6 py-3 rounded-xl bg-civic-900 hover:bg-civic-800 text-white font-semibold text-sm transition shrink-0">
+              Lookup Application
+            </button>
+          </form>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold text-slate-500 mr-1">Quick Load Applications:</span>
+            <div id="trackQuickButtons" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+
+        <!-- Tracking Result Container -->
+        <div id="trackingResultContainer"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 4: IMMIGRATION ADMIN DASHBOARD                                   -->
+    <!-- ===================================================================== -->
+    <section id="view-admin" class="app-view hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <!-- Admin Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100/80 px-2.5 py-1 rounded-full border border-amber-200">
+              <span>Module 04</span>
+              <span>•</span>
+              <span>Consular &amp; Border Adjudication Console</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-civic-950 mt-2">Immigration Admin Dashboard</h1>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="exportApplicationsCsv()" class="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs sm:text-sm font-semibold transition">
+              Export CSV Report
+            </button>
+            <button onclick="resetDemoData()" class="px-4 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs sm:text-sm font-semibold transition">
+              Reset Sample Queue
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div id="adminKpiGrid" class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6"></div>
+
+        <!-- Analytics Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+          <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h2 class="font-bold text-base text-civic-950">Applications by Visa Category</h2>
+                <p class="text-xs text-slate-500">Distribution across Tourist, Student, Business &amp; Medical</p>
+              </div>
+              <span class="text-xs font-mono-code text-slate-400">LIVE</span>
+            </div>
+            <div class="h-60 relative">
+              <canvas id="visaCategoryChart"></canvas>
+            </div>
+          </div>
+
+          <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h2 class="font-bold text-base text-civic-950">Status &amp; Monthly Volume Breakdown</h2>
+                <p class="text-xs text-slate-500">Current adjudication pipeline vs. monthly filings</p>
+              </div>
+              <span class="text-xs font-mono-code text-slate-400">ANALYTICS</span>
+            </div>
+            <div class="h-60 relative">
+              <canvas id="statusBreakdownChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Controls + Applicant Management Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-5 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <h2 class="font-bold text-lg text-civic-950">Applicant Queue &amp; Review Console</h2>
+              <p class="text-xs text-slate-500">Click "Inspect / Review" on any application to verify OCR fields, leave officer remarks, and decide.</p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+              <input id="adminSearchInput" type="text" placeholder="Search ID, Name, Passport..." oninput="renderAdminTable()" class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-civic-500 outline-none w-full sm:w-56" />
+
+              <select id="adminStatusFilter" onchange="renderAdminTable()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm bg-white outline-none">
+                <option value="ALL">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Under Review">Under Review</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+
+              <select id="adminTypeFilter" onchange="renderAdminTable()" class="px-3 py-2 rounded-xl border border-slate-300 text-xs sm:text-sm bg-white outline-none">
+                <option value="ALL">All Visa Types</option>
+                <option value="Tourist">Tourist</option>
+                <option value="Student">Student</option>
+                <option value="Business">Business</option>
+                <option value="Medical">Medical</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  <th class="py-3.5 px-4">App ID</th>
+                  <th class="py-3.5 px-4">Applicant</th>
+                  <th class="py-3.5 px-4">Visa Type</th>
+                  <th class="py-3.5 px-4">Destination</th>
+                  <th class="py-3.5 px-4">OCR Match</th>
+                  <th class="py-3.5 px-4">Status</th>
+                  <th class="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 5: AI VISA ASSISTANT                                             -->
+    <!-- ===================================================================== -->
+    <section id="view-assistant" class="app-view hidden">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div class="mb-6">
+          <span class="text-xs font-bold uppercase tracking-wider text-civic-600">Module 05 • Intelligent Consular Guidance</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-civic-950 mt-1">AI Visa Assistant</h1>
+          <p class="text-sm text-slate-600 mt-1">Ask about visa requirements, country-specific entry rules, document checklists, and application steps.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Chat Window (8 cols) -->
+          <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[580px]">
+            <!-- Chat Header -->
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-civic-950 text-white rounded-t-2xl">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 font-bold">
+                  AI
+                </div>
+                <div>
+                  <div class="font-bold text-sm">Consular AI Advisor</div>
+                  <div class="text-[11px] text-emerald-300 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span>Online • Visa Policy &amp; Checklist Engine</span>
+                  </div>
+                </div>
+              </div>
+              <button onclick="clearChatHistory()" class="text-xs text-slate-300 hover:text-white px-2.5 py-1 rounded-lg bg-white/10 transition">
+                Clear Chat
+              </button>
+            </div>
+
+            <!-- Messages Stream -->
+            <div id="chatMessagesContainer" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-slate-50/60"></div>
+
+            <!-- Quick Prompt Chips -->
+            <div class="px-4 py-2.5 border-t border-slate-100 bg-white flex gap-2 overflow-x-auto no-print">
+              <button type="button" onclick="sendAssistantPrompt('Tourist vs Business visa checklist')" class="px-3 py-1.5 rounded-full bg-civic-50 hover:bg-civic-100 text-civic-800 border border-civic-200 text-xs font-medium whitespace-nowrap transition">
+                Tourist &amp; Business Checklist
+              </button>
+              <button type="button" onclick="sendAssistantPrompt('Student and Medical visa requirements')" class="px-3 py-1.5 rounded-full bg-civic-50 hover:bg-civic-100 text-civic-800 border border-civic-200 text-xs font-medium whitespace-nowrap transition">
+                Student &amp; Medical Docs
+              </button>
+              <button type="button" onclick="sendAssistantPrompt('Country info: USA, UK, Schengen, UAE, India')" class="px-3 py-1.5 rounded-full bg-civic-50 hover:bg-civic-100 text-civic-800 border border-civic-200 text-xs font-medium whitespace-nowrap transition">
+                Country-Wise Info
+              </button>
+              <button type="button" onclick="sendAssistantPrompt('How long does processing take and how to track?')" class="px-3 py-1.5 rounded-full bg-civic-50 hover:bg-civic-100 text-civic-800 border border-civic-200 text-xs font-medium whitespace-nowrap transition">
+                Processing &amp; Tracking FAQ
+              </button>
+            </div>
+
+            <!-- Chat Input -->
+            <form onsubmit="handleChatSubmit(event)" class="p-3.5 border-t border-slate-200 bg-white rounded-b-2xl flex gap-2">
+              <input id="chatInput" type="text" placeholder="Ask a question about visas, countries, checklists, or fees..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-civic-500 focus:border-civic-500 text-sm outline-none" />
+              <button type="submit" class="px-5 py-2.5 rounded-xl bg-civic-900 hover:bg-civic-800 text-white font-semibold text-sm transition shrink-0">
+                Send
+              </button>
+            </form>
+          </div>
+
+          <!-- Right Reference Cards (4 cols) -->
+          <div class="lg:col-span-4 space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <h2 class="font-bold text-sm uppercase tracking-wider text-civic-800 mb-3">Quick Country Lookup</h2>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="sendAssistantPrompt('Tell me about United States visa rules')" class="p-2.5 rounded-xl border border-slate-200 hover:border-civic-400 hover:bg-civic-50 text-left text-xs font-semibold text-slate-800 transition">🇺🇸 United States</button>
+                <button onclick="sendAssistantPrompt('Tell me about United Kingdom visa rules')" class="p-2.5 rounded-xl border border-slate-200 hover:border-civic-400 hover:bg-civic-50 text-left text-xs font-semibold text-slate-800 transition">🇬🇧 United Kingdom</button>
+                <button onclick="sendAssistantPrompt('Tell me about Schengen Area visa rules')" class="p-2.5 rounded-xl border border-slate-200 hover:border-civic-400 hover:bg-civic-50 text-left text-xs font-semibold text-slate-800 transition">🇪🇺 Schengen (EU)</button>
+                <button onclick="sendAssistantPrompt('Tell me about India E-Visa rules')" class="p-2.5 rounded-xl border border-slate-200 hover:border-civic-400 hover:bg-civic-50 text-left text-xs font-semibold text-slate-800 transition">🇮🇳 India</button>
+                <button onclick="sendAssistantPrompt('Tell me about UAE visa rules')" class="p-2.5 rounded-xl border border-slate-200 hover:border-civic-400 hover:bg-civic-50 text-left text-xs font-semibold text-slate-800 transition">🇦🇪 UAE</button>
+                <button onclick="sendAssistantPrompt('Tell me about Canada and Japan visa rules')" class="p-2.5 rounded-xl border border-slate-200 hover:border-civic-400 hover:bg-civic-50 text-left text-xs font-semibold text-slate-800 transition">🇨🇦 / 🇯🇵 Canada &amp; Japan</button>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <h2 class="font-bold text-sm uppercase tracking-wider text-civic-800 mb-2">Golden Passport Rule</h2>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Most immigration jurisdictions require your passport to remain valid for at least <strong class="text-slate-900">6 months beyond</strong> your intended departure date and contain at least <strong class="text-slate-900">2 blank pages</strong> for entry/exit stamps.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Floating AI Assistant Quick Widget (Bottom Right) -->
+  <button id="floatingAiBtn" onclick="switchView('assistant')" title="Open AI Visa Assistant" class="fixed bottom-5 right-5 z-40 w-13 h-13 p-3.5 rounded-full bg-civic-950 hover:bg-civic-800 text-sky-400 shadow-2xl border border-sky-400/40 transition hover:scale-105 no-print flex items-center justify-center">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+    </svg>
+  </button>
+
+  <!-- Footer -->
+  <footer class="bg-civic-950 text-slate-400 border-t border-civic-800 py-8 mt-auto no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+      <div>
+        <span class="font-semibold text-white">eVisaGov Immigration Portal</span> • Simulated E-Visa, OCR &amp; Consular Adjudication Platform
+      </div>
+      <div class="flex items-center gap-4">
+        <span>Data stored locally in browser state</span>
+        <span>•</span>
+        <button onclick="openAuthModal()" class="text-sky-400 hover:underline">Account &amp; Demo Roles</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: USER REGISTRATION & LOGIN (WITH DEMO ACCOUNTS)               -->
+  <!-- ===================================================================== -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100" aria-label="Close modal">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div id="activeSessionBanner" class="hidden mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between gap-2 text-xs">
+        <div>
+          <span class="font-bold text-emerald-900">Active Session:</span>
+          <span id="modalSessionInfo" class="text-emerald-800"></span>
+        </div>
+        <button type="button" onclick="logoutCurrentUser()" class="px-2.5 py-1 rounded-lg bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 font-semibold">
+          Sign Out
+        </button>
+      </div>
+
+      <!-- Tabs: Login vs Register -->
+      <div class="flex gap-1 p-1 rounded-xl bg-slate-100 mb-5">
+        <button type="button" id="authTabLogin" onclick="setAuthTab('login')" class="flex-1 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-civic-950 shadow-xs transition">
+          Sign In
+        </button>
+        <button type="button" id="authTabRegister" onclick="setAuthTab('register')" class="flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
+          Register Account
+        </button>
+      </div>
+
+      <!-- Quick Demo Accounts -->
+      <div class="mb-4 p-3 rounded-xl bg-civic-50 border border-civic-200">
+        <div class="text-[11px] font-bold uppercase tracking-wider text-civic-800 mb-2">One-Click Demo Accounts</div>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="loginAsDemo('applicant')" class="px-3 py-2 rounded-lg bg-white hover:bg-civic-100 border border-civic-200 text-left transition">
+            <div class="text-xs font-bold text-civic-950">Applicant Demo</div>
+            <div class="text-[10px] text-slate-500">aarav@demo.org</div>
+          </button>
+          <button type="button" onclick="loginAsDemo('admin')" class="px-3 py-2 rounded-lg bg-white hover:bg-amber-50 border border-amber-300 text-left transition">
+            <div class="text-xs font-bold text-amber-900">Officer / Admin</div>
+            <div class="text-[10px] text-slate-500">officer@visa.gov</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Address</label>
+          <input id="loginEmail" type="email" required placeholder="name@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-civic-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Password</label>
+          <input id="loginPassword" type="password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-civic-500" />
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-civic-900 hover:bg-civic-800 text-white font-semibold text-sm transition">
+          Sign In to Portal
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-3.5 hidden">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Full Name</label>
+          <input id="regName" type="text" required placeholder="e.g. Priya Sharma" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-civic-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Address</label>
+          <input id="regEmail" type="email" required placeholder="priya@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-civic-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Account Role</label>
+          <select id="regRole" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white outline-none focus:ring-2 focus:ring-civic-500">
+            <option value="applicant">Visa Applicant</option>
+            <option value="admin">Immigration Officer (Admin)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Password</label>
+          <input id="regPassword" type="password" required minlength="6" placeholder="At least 6 characters" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-civic-500" />
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm transition">
+          Create Portal Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: ADMIN APPLICATION INSPECTION & DECISION DRAWER/MODAL         -->
+  <!-- ===================================================================== -->
+  <div id="adminInspectModal" class="fixed inset-0 z-50 hidden bg-slate-950/65 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 my-8 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeAdminInspectModal()" class="sticky top-0 float-right p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 bg-white" aria-label="Close inspection modal">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div id="adminInspectContent"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT: STATE MANAGEMENT, OCR, TRACKING, ADMIN & AI ASSISTANT     -->
+  <!-- ===================================================================== -->
+  <script>
+    // -----------------------------------------------------------------------
+    // 1. VISA CONFIGURATION & INITIAL SAMPLE DATA
+    // -----------------------------------------------------------------------
+    const VISA_TYPES = {
+      Tourist: {
+        id: 'Tourist',
+        title: 'Tourist E-Visa',
+        badgeColor: 'bg-sky-100 text-sky-800 border-sky-200',
+        validity: '90 Days (Single/Double Entry)',
+        processing: '24–72 Hours',
+        feeUsd: 80,
+        summary: 'Tourism, sightseeing, cultural visits, or visiting family and friends.',
+        sponsorLabel: 'Hotel Booking / Host Address *',
+        supportingLabel: 'Travel Itinerary / Hotel Booking *',
+        supportingHint: 'Flight/hotel itinerary or host invitation',
+        checklist: [
+          'Passport valid 6+ months with 2 blank pages',
+          'Recent color photograph (white/light background)',
+          'Round-trip itinerary or accommodation proof',
+          'Proof of sufficient funds for stay'
+        ]
+      },
+      Student: {
+        id: 'Student',
+        title: 'Student E-Visa',
+        badgeColor: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+        validity: '365 Days (Academic Entry)',
+        processing: '3–5 Business Days',
+        feeUsd: 160,
+        summary: 'Enrollment in an accredited university, exchange program, or academic course.',
+        sponsorLabel: 'University / Academic Institution Name *',
+        supportingLabel: 'Admission / Enrollment Letter *',
+        supportingHint: 'Official university acceptance or I-20/CAS equivalent',
+        checklist: [
+          'Passport valid 6+ months beyond arrival',
+          'Official university admission / enrollment letter',
+          'Tuition / financial sponsorship proof',
+          'Academic transcripts or program schedule'
+        ]
+      },
+      Business: {
+        id: 'Business',
+        title: 'Business E-Visa',
+        badgeColor: 'bg-violet-100 text-violet-800 border-violet-200',
+        validity: '180 Days (Multiple Entry)',
+        processing: '24–48 Hours',
+        feeUsd: 140,
+        summary: 'Corporate meetings, trade exhibitions, conferences, contract negotiations, or audits.',
+        sponsorLabel: 'Inviting / Host Company Name *',
+        supportingLabel: 'Business Invitation / Conference Letter *',
+        supportingHint: 'Company invitation letter or event registration',
+        checklist: [
+          'Passport valid 6+ months with blank pages',
+          'Business invitation or conference registration letter',
+          'Employer / company authorization letter',
+          'Corporate contact & address verification'
+        ]
+      },
+      Medical: {
+        id: 'Medical',
+        title: 'Medical E-Visa',
+        badgeColor: 'bg-rose-100 text-rose-800 border-rose-200',
+        validity: '180 Days (Priority Track)',
+        processing: '12–24 Hours (Priority)',
+        feeUsd: 95,
+        summary: 'Specialized medical treatment, surgery, diagnostics, or accompanying attendant.',
+        sponsorLabel: 'Hospital / Medical Center Name *',
+        supportingLabel: 'Hospital Appointment / Medical Letter *',
+        supportingHint: 'Accredited hospital admission or specialist letter',
+        checklist: [
+          'Passport valid 6+ months for patient & attendant',
+          'Hospital appointment / treatment schedule letter',
+          'Home physician medical summary report',
+          'Medical funding / insurance coverage confirmation'
+        ]
+      }
+    };
+
+    const COUNTRY_INFO_DB = {
+      'united states': {
+        name: 'United States',
+        flag: '🇺🇸',
+        entry: 'Requires valid visa or ESTA (for eligible VWP nationalities). Biometrics and port-of-entry CBP inspection apply.',
+        validity: '6-month passport rule generally enforced; I-94 sets authorized stay.',
+        tip: 'Carry return/onward travel details and clear explanation of itinerary or host.'
+      },
+      'united kingdom': {
+        name: 'United Kingdom',
+        flag: '🇬🇧',
+        entry: 'Standard Visitor / Student / Business routes; ETA applies to eligible visa-exempt nationals.',
+        validity: 'Passport must be valid for the entire duration of stay in the UK.',
+        tip: 'Prepare clear accommodation proof, financial evidence, and return plans.'
+      },
+      'schengen': {
+        name: 'Schengen Area (EU)',
+        flag: '🇪🇺',
+        entry: '90/180-day short-stay rule across 29 European Schengen member states.',
+        validity: 'Passport must be issued within last 10 years and valid 3+ months after planned departure.',
+        tip: 'Travel medical insurance with minimum €30,000 coverage is standard for Schengen visas.'
+      },
+      'india': {
+        name: 'India',
+        flag: '🇮🇳',
+        entry: 'E-Visa categories cover e-Tourist, e-Business, e-Medical, and e-Conference via designated airports/seaports.',
+        validity: 'Passport must have at least 6 months validity from date of arrival and 2 blank pages.',
+        tip: 'Ensure digital photo and passport bio-page match exact passport spelling.'
+      },
+      'uae': {
+        name: 'United Arab Emirates',
+        flag: '🇦🇪',
+        entry: 'Short-term tourist/visit and business entry permits with rapid digital processing.',
+        validity: 'Passport must have at least 6 months validity upon arrival.',
+        tip: 'Keep hotel confirmation or UAE host/sponsor details handy at immigration.'
+      },
+      'canada': {
+        name: 'Canada',
+        flag: '🇨🇦',
+        entry: 'Temporary Resident Visa (TRV) or eTA depending on nationality; biometrics may be required.',
+        validity: 'Passport validity should cover intended stay in Canada.',
+        tip: 'Demonstrate strong ties to home country, clear purpose, and proof of funds.'
+      },
+      'japan': {
+        name: 'Japan',
+        flag: '🇯🇵',
+        entry: 'Short-stay temporary visitor or long-term student/business status; Visit Web declaration speeds arrival.',
+        validity: 'Valid passport required with sufficient validity for stay.',
+        tip: 'Detailed daily travel schedule and hotel bookings help streamline short-stay applications.'
+      }
+    };
+
+    const INITIAL_APPLICATIONS = [
+      {
+        id: 'EV-2026-8492',
+        fullName: 'Aarav Mehta',
+        email: 'aarav@demo.org',
+        nationality: 'India',
+        passportNo: 'Z8492014',
+        dob: '1996-04-18',
+        passportExpiry: '2030-09-12',
+        residence: 'India',
+        visaType: 'Tourist',
+        destination: 'United States',
+        arrivalDate: '2026-12-15',
+        stayDays: 14,
+        sponsor: 'Marriott Downtown, Chicago',
+        purpose: 'Holiday sightseeing and visiting family friends in Chicago.',
+        feeUsd: 80,
+        status: 'Under Review',
+        createdAt: '2026-11-21 10:15',
+        officerNotes: 'MRZ checksum verified (98.4%). Awaiting final itinerary cross-check.',
+        documents: {
+          passport: 'aarav_passport_bio.jpg',
+          photo: 'aarav_photo_35x45.png',
+          supporting: 'chicago_hotel_itinerary.pdf'
+        },
+        ocr: {
+          fullName: 'AARAV MEHTA',
+          passportNo: 'Z8492014',
+          nationality: 'IND',
+          dob: '1996-04-18',
+          expiry: '2030-09-12',
+          confidence: '98.4%',
+          mrz: 'P<INDMEHTA<<AARAV<<<<<<<<<<<<<<<<<<<<<<<<<'
+        },
+        timeline: [
+          { stage: 'Application Submitted', date: '2026-11-21 10:15', note: 'Application EV-2026-8492 registered and fee recorded ($80 USD).' },
+          { stage: 'OCR & Document Check', date: '2026-11-21 10:17', note: 'Passport bio-page scanned with 98.4% confidence; MRZ valid.' },
+          { stage: 'Under Review', date: '2026-11-22 14:40', note: 'Assigned to Consular Officer #14 for routine verification.' }
+        ]
+      },
+      {
+        id: 'EV-2026-5109',
+        fullName: 'Elena Rostova',
+        email: 'elena.rostova@example.com',
+        nationality: 'Germany',
+        passportNo: 'C4491820',
+        dob: '2001-08-25',
+        passportExpiry: '2029-05-01',
+        residence: 'Germany',
+        visaType: 'Student',
+        destination: 'United Kingdom',
+        arrivalDate: '2027-01-10',
+        stayDays: 240,
+        sponsor: 'King’s College London',
+        purpose: 'Master’s exchange semester in Computational Policy.',
+        feeUsd: 160,
+        status: 'Approved',
+        createdAt: '2026-11-14 09:05',
+        officerNotes: 'Verified university offer letter and financial maintenance proof. Approved.',
+        documents: {
+          passport: 'elena_de_passport.pdf',
+          photo: 'elena_portrait.jpg',
+          supporting: 'kcl_admission_offer.pdf'
+        },
+        ocr: {
+          fullName: 'ELENA ROSTOVA',
+          passportNo: 'C4491820',
+          nationality: 'DEU',
+          dob: '2001-08-25',
+          expiry: '2029-05-01',
+          confidence: '99.1%',
+          mrz: 'P<DEUROSTOVA<<ELENA<<<<<<<<<<<<<<<<<<<<<<<'
+        },
+        timeline: [
+          { stage: 'Application Submitted', date: '2026-11-14 09:05', note: 'Student E-Visa application EV-2026-5109 submitted.' },
+          { stage: 'OCR & Document Check', date: '2026-11-14 09:08', note: 'All three mandatory documents verified (99.1% OCR score).' },
+          { stage: 'Under Review', date: '2026-11-15 11:20', note: 'Academic institution sponsor confirmed.' },
+          { stage: 'Approved', date: '2026-11-16 16:50', note: 'E-Visa granted for 365 days. Electronic clearance pass issued.' }
+        ]
+      },
+      {
+        id: 'EV-2026-3920',
+        fullName: 'Marcus Vance',
+        email: 'm.vance@apexlogistics.io',
+        nationality: 'Canada',
+        passportNo: 'CA773190',
+        dob: '1988-02-11',
+        passportExpiry: '2028-11-30',
+        residence: 'Canada',
+        visaType: 'Business',
+        destination: 'Schengen Area (EU)',
+        arrivalDate: '2026-12-03',
+        stayDays: 10,
+        sponsor: 'RheinTech Logistics GmbH',
+        purpose: 'Supply-chain automation summit and partner contract review in Frankfurt.',
+        feeUsd: 140,
+        status: 'Pending',
+        createdAt: '2026-11-23 17:30',
+        officerNotes: 'Queued for automated & consular screening.',
+        documents: {
+          passport: 'm_vance_passport.png',
+          photo: 'm_vance_photo.jpg',
+          supporting: 'rheintech_invitation.pdf'
+        },
+        ocr: {
+          fullName: 'MARCUS VANCE',
+          passportNo: 'CA773190',
+          nationality: 'CAN',
+          dob: '1988-02-11',
+          expiry: '2028-11-30',
+          confidence: '97.8%',
+          mrz: 'P<CANVANCE<<MARCUS<<<<<<<<<<<<<<<<<<<<<<<<'
+        },
+        timeline: [
+          { stage: 'Application Submitted', date: '2026-11-23 17:30', note: 'Business E-Visa application EV-2026-3920 received.' },
+          { stage: 'OCR & Document Check', date: '2026-11-23 17:32', note: 'Passport & invitation file attached (97.8% OCR score).' }
+        ]
+      },
+      {
+        id: 'EV-2026-1944',
+        fullName: 'Nadia Al-Mansoor',
+        email: 'nadia.m@example.com',
+        nationality: 'United Arab Emirates',
+        passportNo: 'AE902144',
+        dob: '1979-11-03',
+        passportExpiry: '2027-02-15',
+        residence: 'United Arab Emirates',
+        visaType: 'Medical',
+        destination: 'India',
+        arrivalDate: '2026-12-08',
+        stayDays: 30,
+        sponsor: 'Apollo Specialty Hospital',
+        purpose: 'Orthopedic consultation and physical rehabilitation program.',
+        feeUsd: 95,
+        status: 'Rejected',
+        createdAt: '2026-11-18 13:10',
+        officerNotes: 'Passport expires within 3 months of arrival window; renew passport and reapply under priority medical track.',
+        documents: {
+          passport: 'nadia_passport_scan.jpg',
+          photo: 'nadia_photo.jpg',
+          supporting: 'apollo_medical_letter.pdf'
+        },
+        ocr: {
+          fullName: 'NADIA AL MANSOOR',
+          passportNo: 'AE902144',
+          nationality: 'ARE',
+          dob: '1979-11-03',
+          expiry: '2027-02-15',
+          confidence: '96.6%',
+          mrz: 'P<AREAL<MANSOOR<<NADIA<<<<<<<<<<<<<<<<<<'
+        },
+        timeline: [
+          { stage: 'Application Submitted', date: '2026-11-18 13:10', note: 'Priority Medical E-Visa EV-2026-1944 submitted.' },
+          { stage: 'Under Review', date: '2026-11-19 09:45', note: 'Consular officer flagged short passport validity window.' },
+          { stage: 'Rejected', date: '2026-11-19 15:20', note: 'Refused due to insufficient remaining passport validity.' }
+        ]
+      }
+    ];
+
+    const STORAGE_KEY = 'evisa_portal_state_v1';
+
+    function getDefaultState() {
+      return {
+        currentView: 'home',
+        currentUser: null, // { name, email, role: 'applicant' | 'admin' }
+        applications: JSON.parse(JSON.stringify(INITIAL_APPLICATIONS)),
+        selectedTrackId: 'EV-2026-8492',
+        formStep: 1,
+        selectedVisaType: 'Tourist',
+        uploads: {
+          passport: null,
+          photo: null,
+          supporting: null
+        },
+        ocrData: null,
+        chatHistory: [
+          {
+            sender: 'ai',
+            text: 'Hello! I am your **Consular AI Visa Assistant**. Ask me about **Tourist, Student, Business, or Medical** visa requirements, **country-specific entry rules** (USA, UK, Schengen, India, UAE, Canada, Japan), document checklists, or how to track your Application ID.'
+          }
+        ]
+      };
+    }
+
+    let state = loadState();
+    let visaChartInstance = null;
+    let statusChartInstance = null;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return getDefaultState();
+        const parsed = JSON.parse(raw);
+        return {
+          ...getDefaultState(),
+          ...parsed,
+          applications: Array.isArray(parsed.applications) && parsed.applications.length ? parsed.applications : JSON.parse(JSON.stringify(INITIAL_APPLICATIONS)),
+          chatHistory: Array.isArray(parsed.chatHistory) && parsed.chatHistory.length ? parsed.chatHistory : getDefaultState().chatHistory
+        };
+      } catch (err) {
+        console.error('Failed to load state:', err);
+        return getDefaultState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (err) {
+        console.error('Failed to save state:', err);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. TOAST NOTIFICATIONS (REPLACES alert())
+    // -----------------------------------------------------------------------
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const styles = {
+        info: 'bg-civic-950 text-white border-sky-400/40',
+        success: 'bg-emerald-950 text-emerald-50 border-emerald-400/50',
+        warning: 'bg-amber-950 text-amber-50 border-amber-400/50',
+        error: 'bg-rose-950 text-rose-50 border-rose-400/50'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-xl text-xs sm:text-sm font-medium flex items-center justify-between gap-3 transition transform duration-200 ${styles[type] || styles.info}`;
+      toast.innerHTML = `
+        <span>${escapeHtml(message)}</span>
+        <button onclick="this.parentElement.remove()" class="text-white/70 hover:text-white font-bold">✕</button>
+      `;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        if (toast.parentElement) toast.remove();
+      }, 3800);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. NAVIGATION & SESSION UI
+    // -----------------------------------------------------------------------
+    function switchView(viewName) {
+      const validViews = ['home', 'apply', 'track', 'admin', 'assistant'];
+      if (!validViews.includes(viewName)) viewName = 'home';
+
+      state.currentView = viewName;
+      saveState();
+
+      document.querySelectorAll('.app-view').forEach(sec => sec.classList.add('hidden'));
+      const target = document.getElementById(`view-${viewName}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-nav') === viewName;
+        btn.classList.toggle('bg-white/15', isActive);
+        btn.classList.toggle('text-white', isActive);
+      });
+
+      if (viewName === 'home') renderHomeCards();
+      if (viewName === 'apply') renderApplicationView();
+      if (viewName === 'track') renderTrackingView(state.selectedTrackId);
+      if (viewName === 'admin') renderAdminDashboard();
+      if (viewName === 'assistant') renderChatMessages();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleAdminNavClick() {
+      if (!state.currentUser || state.currentUser.role !== 'admin') {
+        showToast('Signing in with Officer/Admin demo session for instant adjudication access.', 'info');
+        loginAsDemo('admin', 'admin');
+        return;
+      }
+      switchView('admin');
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const iconOpen = document.getElementById('mobileMenuIconOpen');
+      const iconClose = document.getElementById('mobileMenuIconClose');
+      const isHidden = menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', !isHidden);
+      iconOpen.classList.toggle('hidden', isHidden);
+      iconClose.classList.toggle('hidden', !isHidden);
+    }
+
+    function updateSessionUI() {
+      const user = state.currentUser;
+      const dot = document.getElementById('sessionDot');
+      const text = document.getElementById('sessionUserText');
+      const pill = document.getElementById('sessionRolePill');
+      const authBtn = document.getElementById('authActionBtn');
+      const mobileText = document.getElementById('mobileSessionText');
+      const mobileRole = document.getElementById('mobileSessionRole');
+      const activeBanner = document.getElementById('activeSessionBanner');
+      const modalSessionInfo = document.getElementById('modalSessionInfo');
+
+      if (user) {
+        text.textContent = user.name;
+        pill.textContent = user.role === 'admin' ? 'Admin' : 'Applicant';
+        pill.className = user.role === 'admin'
+          ? 'px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30'
+          : 'px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-sky-400/20 text-sky-300 border border-sky-400/30';
+        dot.className = user.role === 'admin' ? 'w-2 h-2 rounded-full bg-amber-400' : 'w-2 h-2 rounded-full bg-emerald-400';
+        authBtn.textContent = 'Account';
+        mobileText.textContent = `Signed in: ${user.name}`;
+        mobileRole.textContent = user.role.toUpperCase();
+        activeBanner.classList.remove('hidden');
+        modalSessionInfo.textContent = ` ${user.name} (${user.role})`;
+      } else {
+        text.textContent = 'Guest';
+        pill.textContent = 'Visitor';
+        pill.className = 'px-1.5 py-0.5 rounded text-[10px] uppercase font-semibold bg-slate-700 text-slate-200';
+        dot.className = 'w-2 h-2 rounded-full bg-slate-400';
+        authBtn.textContent = 'Sign In / Register';
+        mobileText.textContent = 'Signed in as Guest';
+        mobileRole.textContent = 'VISITOR';
+        activeBanner.classList.add('hidden');
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. AUTH MODAL (LOGIN, REGISTER & DEMO ACCOUNTS)
+    // -----------------------------------------------------------------------
+    function openAuthModal() {
+      updateSessionUI();
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+
+    function setAuthTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('authTabLogin').className = isLogin
+        ? 'flex-1 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-civic-950 shadow-xs transition'
+        : 'flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition';
+      document.getElementById('authTabRegister').className = !isLogin
+        ? 'flex-1 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white text-civic-950 shadow-xs transition'
+        : 'flex-1 py-2 rounded-lg text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition';
+      document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+      document.getElementById('registerForm').classList.toggle('hidden', isLogin);
+    }
+
+    function loginAsDemo(role, redirectView = null) {
+      if (role === 'admin') {
+        state.currentUser = { name: 'Officer R. Kulkarni', email: 'officer@visa.gov', role: 'admin' };
+        showToast('Signed in as Immigration Officer (Admin).', 'success');
+      } else {
+        state.currentUser = { name: 'Aarav Mehta', email: 'aarav@demo.org', role: 'applicant' };
+        showToast('Signed in as Demo Visa Applicant (Aarav Mehta).', 'success');
+      }
+      saveState();
+      updateSessionUI();
+      closeAuthModal();
+      if (redirectView) switchView(redirectView);
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const role = email.toLowerCase().includes('officer') || email.toLowerCase().includes('admin') ? 'admin' : 'applicant';
+      const derivedName = email.split('@')[0].replace(/[._-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Portal User';
+      state.currentUser = { name: derivedName, email, role };
+      saveState();
+      updateSessionUI();
+      closeAuthModal();
+      showToast(`Welcome back, ${derivedName}!`, 'success');
+      if (role === 'admin') switchView('admin');
+    }
+
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const role = document.getElementById('regRole').value;
+      state.currentUser = { name, email, role };
+      saveState();
+      updateSessionUI();
+      closeAuthModal();
+      showToast(`Account created for ${name} (${role}).`, 'success');
+      if (role === 'admin') switchView('admin');
+      else switchView('apply');
+    }
+
+    function logoutCurrentUser() {
+      state.currentUser = null;
+      saveState();
+      updateSessionUI();
+      closeAuthModal();
+      showToast('Signed out of portal session.', 'info');
+      if (state.currentView === 'admin') switchView('home');
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. HOME VIEW RENDERING
+    // -----------------------------------------------------------------------
+    function renderHomeCards() {
+      const container = document.getElementById('visaCategoryCards');
+      if (!container) return;
+
+      container.innerHTML = Object.values(VISA_TYPES).map(v => `
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-civic-300 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold border ${v.badgeColor}">${v.id}</span>
+              <span class="text-sm font-extrabold text-civic-950">$${v.feeUsd} USD</span>
+            </div>
+            <h3 class="text-lg font-bold text-civic-950">${v.title}</h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">${v.summary}</p>
+          </div>
+          <div class="mt-5 pt-3 border-t border-slate-100 space-y-2">
+            <div class="flex justify-between text-xs text-slate-500">
+              <span>Validity:</span>
+              <span class="font-semibold text-slate-800">${v.validity.split(' (')[0]}</span>
+            </div>
+            <div class="flex justify-between text-xs text-slate-500">
+              <span>Processing:</span>
+              <span class="font-semibold text-emerald-700">${v.processing}</span>
+            </div>
+            <button onclick="startApplyWithVisa('${v.id}')" class="mt-2 w-full py-2.5 rounded-xl bg-civic-900 hover:bg-civic-800 text-white text-xs font-semibold transition">
+              Apply for ${v.id} Visa
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      // Sample ID pills in Hero
+      const heroIds = document.getElementById('heroSampleIds');
+      if (heroIds) {
+        heroIds.innerHTML = state.applications.slice(0, 4).map(app => `
+          <button type="button" onclick="jumpToTracking('${app.id}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-civic-100 text-slate-800 hover:text-civic-900 font-mono-code text-xs font-medium transition">
+            ${app.id} (${app.status})
+          </button>
+        `).join('');
+      }
+    }
+
+    function startApplyWithVisa(visaType) {
+      state.selectedVisaType = visaType;
+      saveState();
+      switchView('apply');
+    }
+
+    function quickTrackSubmit(e) {
+      e.preventDefault();
+      const val = document.getElementById('heroTrackInput').value.trim().toUpperCase();
+      if (!val) {
+        showToast('Please enter an Application ID to track.', 'warning');
+        return;
+      }
+      jumpToTracking(val);
+    }
+
+    function jumpToTracking(appId) {
+      state.selectedTrackId = appId.toUpperCase();
+      saveState();
+      switchView('track');
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. MULTI-STEP APPLICATION FORM, DOCUMENT UPLOAD & SIMULATED OCR
+    // -----------------------------------------------------------------------
+    const STEP_META = [
+      { step: 1, title: 'Personal & Passport', sub: 'Biographical & travel doc' },
+      { step: 2, title: 'Visa & Itinerary', sub: 'Category, dates & sponsor' },
+      { step: 3, title: 'Docs & OCR Scan', sub: 'Uploads & field extraction' },
+      { step: 4, title: 'Review & Submit', sub: 'Verify & generate ID' }
+    ];
+
+    function renderApplicationView() {
+      renderVisaSelectorGrid();
+      applySelectedVisaMeta();
+      renderStepIndicator();
+      showCurrentFormStep();
+      renderUploadPreviews();
+      renderOcrPanel();
+      updateLiveSummary();
+    }
+
+    function renderVisaSelectorGrid() {
+      const grid = document.getElementById('visaSelectorGrid');
+      if (!grid) return;
+      grid.innerHTML = Object.values(VISA_TYPES).map(v => {
+        const active = state.selectedVisaType === v.id;
+        return `
+          <button type="button" onclick="selectVisaCategory('${v.id}')" class="p-3.5 rounded-xl border text-left transition ${
+            active
+              ? 'border-civic-600 bg-civic-50 ring-2 ring-civic-500/30'
+              : 'border-slate-200 bg-white hover:border-slate-300'
+          }">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-civic-950">${v.title}</span>
+              <span class="text-xs font-extrabold text-civic-700">$${v.feeUsd}</span>
+            </div>
+            <p class="text-[11px] text-slate-600 mt-1 line-clamp-2">${v.summary}</p>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectVisaCategory(visaType) {
+      state.selectedVisaType = visaType;
+      saveState();
+      renderVisaSelectorGrid();
+      applySelectedVisaMeta();
+      updateLiveSummary();
+    }
+
+    function applySelectedVisaMeta() {
+      const info = VISA_TYPES[state.selectedVisaType] || VISA_TYPES.Tourist;
+      document.getElementById('metaVisaTitle').textContent = info.title;
+      document.getElementById('metaVisaDesc').textContent = info.summary;
+      document.getElementById('metaVisaValidity').textContent = info.validity.split(' (')[0];
+      document.getElementById('metaVisaFee').textContent = `$${info.feeUsd} USD`;
+      document.getElementById('sponsorLabel').textContent = info.sponsorLabel;
+      document.getElementById('supportingDocTitle').textContent = info.supportingLabel;
+      document.getElementById('supportingDocHint').textContent = info.supportingHint;
+      document.getElementById('checklistVisaName').textContent = info.title;
+      document.getElementById('checklistItems').innerHTML = info.checklist
+        .map(item => `<li class="flex items-start gap-1.5"><span class="text-emerald-700 font-bold">✓</span><span>${escapeHtml(item)}</span></li>`)
+        .join('');
+    }
+
+    function renderStepIndicator() {
+      const grid = document.getElementById('stepIndicatorGrid');
+      const bar = document.getElementById('stepProgressBar');
+      if (!grid || !bar) return;
+
+      grid.innerHTML = STEP_META.map(s => {
+        const done = state.formStep > s.step;
+        const current = state.formStep === s.step;
+        return `
+          <button type="button" onclick="jumpToStep(${s.step})" class="p-2.5 sm:p-3 rounded-xl border text-left transition ${
+            current
+              ? 'border-civic-600 bg-civic-50 text-civic-950'
+              : done
+              ? 'border-emerald-200 bg-emerald-50/60 text-emerald-950'
+              : 'border-slate-200 bg-slate-50/50 text-slate-500'
+          }">
+            <div class="flex items-center justify-between text-xs font-bold">
+              <span>STEP 0${s.step}</span>
+              <span>${done ? '✓' : current ? '●' : ''}</span>
+            </div>
+            <div class="font-bold text-xs sm:text-sm mt-0.5 truncate">${s.title}</div>
+            <div class="text-[11px] opacity-75 hidden sm:block truncate">${s.sub}</div>
+          </button>
+        `;
+      }).join('');
+
+      bar.style.width = `${(state.formStep / 4) * 100}%`;
+    }
+
+    function jumpToStep(targetStep) {
+      if (targetStep < state.formStep) {
+        state.formStep = targetStep;
+        saveState();
+        renderStepIndicator();
+        showCurrentFormStep();
+      } else if (targetStep > state.formStep) {
+        // Validate intermediate steps sequentially
+        while (state.formStep < targetStep) {
+          if (!validateCurrentStep(state.formStep)) return;
+          state.formStep++;
+        }
+        saveState();
+        renderStepIndicator();
+        showCurrentFormStep();
+      }
+    }
+
+    function showCurrentFormStep() {
+      document.querySelectorAll('.form-step').forEach((el, idx) => {
+        el.classList.toggle('hidden', idx + 1 !== state.formStep);
+      });
+
+      document.getElementById('prevStepBtn').classList.toggle('hidden', state.formStep === 1);
+      document.getElementById('nextStepBtn').classList.toggle('hidden', state.formStep === 4);
+      document.getElementById('submitAppBtn').classList.toggle('hidden', state.formStep !== 4);
+
+      if (state.formStep === 4) {
+        renderReviewSummary();
+      }
+    }
+
+    function changeFormStep(delta) {
+      if (delta > 0 && !validateCurrentStep(state.formStep)) {
+        showToast('Please complete all required fields highlighted in red.', 'warning');
+        return;
+      }
+      state.formStep = Math.min(4, Math.max(1, state.formStep + delta));
+      saveState();
+      renderStepIndicator();
+      showCurrentFormStep();
+    }
+
+    function setFieldError(fieldId, hasError) {
+      const errEl = document.querySelector(`[data-err="${fieldId}"]`);
+      if (errEl) errEl.classList.toggle('hidden', !hasError);
+    }
+
+    function validateCurrentStep(step) {
+      let valid = true;
+      if (step === 1) {
+        const name = document.getElementById('appFullName').value.trim();
+        const email = document.getElementById('appEmail').value.trim();
+        const nat = document.getElementById('appNationality').value.trim();
+        const pass = document.getElementById('appPassportNo').value.trim();
+        const dob = document.getElementById('appDob').value;
+        const exp = document.getElementById('appPassportExpiry').value;
+        const res = document.getElementById('appResidence').value.trim();
+
+        setFieldError('appFullName', !name); if (!name) valid = false;
+        setFieldError('appEmail', !email || !email.includes('@')); if (!email || !email.includes('@')) valid = false;
+        setFieldError('appNationality', !nat); if (!nat) valid = false;
+        setFieldError('appPassportNo', pass.length < 5); if (pass.length < 5) valid = false;
+        setFieldError('appDob', !dob); if (!dob) valid = false;
+        setFieldError('appPassportExpiry', !exp); if (!exp) valid = false;
+        setFieldError('appResidence', !res); if (!res) valid = false;
+      } else if (step === 2) {
+        const arrival = document.getElementById('appArrivalDate').value;
+        const sponsor = document.getElementById('appSponsor').value.trim();
+        const purpose = document.getElementById('appPurpose').value.trim();
+
+        setFieldError('appArrivalDate', !arrival); if (!arrival) valid = false;
+        setFieldError('appSponsor', !sponsor); if (!sponsor) valid = false;
+        setFieldError('appPurpose', !purpose); if (!purpose) valid = false;
+      } else if (step === 3) {
+        // Ensure at least passport is uploaded or OCR scan has been run
+        if (!state.uploads.passport && !state.ocrData) {
+          showToast('Please upload a Passport file or click "Run Sample OCR Scan" to proceed.', 'warning');
+          return false;
+        }
+      }
+      return valid;
+    }
+
+    function updateLiveSummary() {
+      const name = document.getElementById('appFullName')?.value.trim() || '—';
+      const pass = document.getElementById('appPassportNo')?.value.trim().toUpperCase() || '—';
+      const dest = document.getElementById('appDestination')?.value || 'United States';
+      const arr = document.getElementById('appArrivalDate')?.value || '—';
+      const visaInfo = VISA_TYPES[state.selectedVisaType] || VISA_TYPES.Tourist;
+
+      const elName = document.getElementById('sumName');
+      if (elName) elName.textContent = name;
+      const elPass = document.getElementById('sumPassport');
+      if (elPass) elPass.textContent = pass;
+      const elVisa = document.getElementById('sumVisaType');
+      if (elVisa) elVisa.textContent = visaInfo.title;
+      const elDest = document.getElementById('sumDestination');
+      if (elDest) elDest.textContent = dest;
+      const elArr = document.getElementById('sumArrival');
+      if (elArr) elArr.textContent = arr;
+      const elFee = document.getElementById('sumFee');
+      if (elFee) elFee.textContent = `$${visaInfo.feeUsd} USD`;
+    }
+
+    // Drag & Drop + File Selection
+    function handleDragOver(e, docKey) {
+      e.preventDefault();
+      document.getElementById(`dropzone-${docKey}`)?.classList.add('border-civic-600', 'bg-civic-50/70');
+    }
+
+    function handleDragLeave(docKey) {
+      document.getElementById(`dropzone-${docKey}`)?.classList.remove('border-civic-600', 'bg-civic-50/70');
+    }
+
+    function handleDrop(e, docKey) {
+      e.preventDefault();
+      handleDragLeave(docKey);
+      const file = e.dataTransfer?.files?.[0];
+      if (file) attachDocument(docKey, file);
+    }
+
+    function handleFileSelect(e, docKey) {
+      const file = e.target?.files?.[0];
+      if (file) attachDocument(docKey, file);
+    }
+
+    function attachDocument(docKey, file) {
+      const sizeKb = Math.max(12, Math.round(file.size / 1024));
+      state.uploads[docKey] = {
+        name: file.name,
+        sizeKb,
+        uploadedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      saveState();
+      renderUploadPreviews();
+      showToast(`Attached ${file.name} (${sizeKb} KB)`, 'success');
+
+      // Automatically trigger OCR scan when passport is uploaded
+      if (docKey === 'passport') {
+        runSimulatedOcrScan(file.name);
+      }
+    }
+
+    function renderUploadPreviews() {
+      ['passport', 'photo', 'supporting'].forEach(key => {
+        const el = document.getElementById(`preview-${key}`);
+        if (!el) return;
+        const doc = state.uploads[key];
+        if (doc) {
+          el.innerHTML = `<span class="text-emerald-700 font-semibold">✓ ${escapeHtml(doc.name)}</span> <span class="text-slate-400">(${doc.sizeKb}KB)</span>`;
+        } else {
+          el.textContent = 'No file uploaded';
+        }
+      });
+    }
+
+    function runSimulatedOcrScan(sourceFilename = null) {
+      const overlay = document.getElementById('ocrScanningOverlay');
+      if (overlay) overlay.classList.remove('hidden');
+
+      const typedName = document.getElementById('appFullName')?.value.trim();
+      const typedPass = document.getElementById('appPassportNo')?.value.trim().toUpperCase();
+      const typedNat = document.getElementById('appNationality')?.value.trim();
+      const typedDob = document.getElementById('appDob')?.value;
+      const typedExp = document.getElementById('appPassportExpiry')?.value;
+
+      setTimeout(() => {
+        const fullName = (typedName || 'AARAV MEHTA').toUpperCase();
+        const passportNo = typedPass && typedPass.length >= 5 ? typedPass : 'Z8492014';
+        const nationality = (typedNat || 'INDIA').toUpperCase();
+        const dob = typedDob || '1996-04-18';
+        const expiry = typedExp || '2030-09-12';
+        const cleanSurname = fullName.split(' ').slice(-1)[0].replace(/[^A-Z]/g, '') || 'MEHTA';
+        const cleanGiven = fullName.split(' ')[0].replace(/[^A-Z]/g, '') || 'AARAV';
+
+        state.ocrData = {
+          fullName,
+          passportNo,
+          nationality,
+          dob,
+          expiry,
+          confidence: '98.7%',
+          sourceFile: sourceFilename || state.uploads.passport?.name || 'sample_passport_mrz.jpg',
+          mrz: `P<IND${cleanSurname}<<${cleanGiven}<<<<<<<<<<<<<<<<<<<<<`
+        };
+
+        if (!state.uploads.passport) {
+          state.uploads.passport = {
+            name: state.ocrData.sourceFile,
+            sizeKb: 418,
+            uploadedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          renderUploadPreviews();
+        }
+
+        saveState();
+        renderOcrPanel();
+        if (overlay) overlay.classList.add('hidden');
+        showToast('OCR scan complete: Passport fields extracted (98.7% confidence).', 'success');
+      }, 750);
+    }
+
+    function renderOcrPanel() {
+      const data = state.ocrData;
+      const badge = document.getElementById('ocrConfidenceBadge');
+      if (!badge) return;
+
+      if (!data) {
+        badge.textContent = 'Awaiting Scan';
+        document.getElementById('ocrFieldName').textContent = '—';
+        document.getElementById('ocrFieldPassport').textContent = '—';
+        document.getElementById('ocrFieldNationality').textContent = '—';
+        document.getElementById('ocrFieldDob').textContent = '—';
+        document.getElementById('ocrFieldExpiry').textContent = '—';
+        return;
+      }
+
+      badge.textContent = `Confidence: ${data.confidence}`;
+      badge.className = 'px-2.5 py-1 rounded-full text-xs font-mono-code bg-emerald-500/20 text-emerald-300 border border-emerald-400/30';
+      document.getElementById('ocrFieldName').textContent = data.fullName;
+      document.getElementById('ocrFieldPassport').textContent = data.passportNo;
+      document.getElementById('ocrFieldNationality').textContent = data.nationality;
+      document.getElementById('ocrFieldDob').textContent = data.dob;
+      document.getElementById('ocrFieldExpiry').textContent = data.expiry;
+      document.getElementById('ocrFieldMrz').textContent = data.mrz;
+    }
+
+    function applyOcrToFormFields() {
+      if (!state.ocrData) {
+        showToast('Run an OCR scan first to extract passport fields.', 'warning');
+        return;
+      }
+      const titleCaseName = state.ocrData.fullName
+        .toLowerCase()
+        .replace(/\b\w/g, c => c.toUpperCase());
+      const titleCaseNat = state.ocrData.nationality
+        .toLowerCase()
+        .replace(/\b\w/g, c => c.toUpperCase());
+
+      document.getElementById('appFullName').value = titleCaseName;
+      document.getElementById('appPassportNo').value = state.ocrData.passportNo;
+      document.getElementById('appNationality').value = titleCaseNat;
+      if (state.ocrData.dob) document.getElementById('appDob').value = state.ocrData.dob;
+      if (state.ocrData.expiry) document.getElementById('appPassportExpiry').value = state.ocrData.expiry;
+
+      updateLiveSummary();
+      showToast('Extracted OCR fields synced into Step 1 form.', 'success');
+    }
+
+    function fillSampleApplicationData() {
+      document.getElementById('appFullName').value = 'Rohan Deshmukh';
+      document.getElementById('appEmail').value = 'rohan.deshmukh@example.com';
+      document.getElementById('appNationality').value = 'India';
+      document.getElementById('appPassportNo').value = 'P6620918';
+      document.getElementById('appDob').value = '1994-07-19';
+      document.getElementById('appPassportExpiry').value = '2031-03-22';
+      document.getElementById('appPhone').value = '+91 98201 44510';
+      document.getElementById('appResidence').value = 'India';
+
+      document.getElementById('appDestination').value = 'United States';
+      document.getElementById('appArrivalDate').value = '2026-12-20';
+      document.getElementById('appStayDays').value = '12';
+      document.getElementById('appSponsor').value = 'Hilton Midtown, New York';
+      document.getElementById('appPurpose').value = 'Winter sightseeing trip to New York City and museum visits.';
+
+      state.uploads = {
+        passport: { name: 'rohan_passport_bio.jpg', sizeKb: 492, uploadedAt: 'Now' },
+        photo: { name: 'rohan_visa_photo.jpg', sizeKb: 148, uploadedAt: 'Now' },
+        supporting: { name: 'nyc_hotel_confirmation.pdf', sizeKb: 265, uploadedAt: 'Now' }
+      };
+      state.ocrData = {
+        fullName: 'ROHAN DESHMUKH',
+        passportNo: 'P6620918',
+        nationality: 'INDIA',
+        dob: '1994-07-19',
+        expiry: '2031-03-22',
+        confidence: '99.0%',
+        mrz: 'P<INDDESHMUKH<<ROHAN<<<<<<<<<<<<<<<<<<<<<<<'
+      };
+      saveState();
+      renderUploadPreviews();
+      renderOcrPanel();
+      updateLiveSummary();
+      showToast('Sample applicant profile, documents & OCR data loaded!', 'success');
+    }
+
+    function resetApplicationForm() {
+      document.getElementById('evisaForm')?.reset();
+      state.formStep = 1;
+      state.uploads = { passport: null, photo: null, supporting: null };
+      state.ocrData = null;
+      saveState();
+      renderApplicationView();
+      showToast('Application form reset.', 'info');
+    }
+
+    function renderReviewSummary() {
+      const container = document.getElementById('reviewSummaryCard');
+      if (!container) return;
+      const visaInfo = VISA_TYPES[state.selectedVisaType] || VISA_TYPES.Tourist;
+
+      const data = {
+        fullName: document.getElementById('appFullName').value.trim() || '—',
+        email: document.getElementById('appEmail').value.trim() || '—',
+        nationality: document.getElementById('appNationality').value.trim() || '—',
+        passportNo: document.getElementById('appPassportNo').value.trim().toUpperCase() || '—',
+        dob: document.getElementById('appDob').value || '—',
+        expiry: document.getElementById('appPassportExpiry').value || '—',
+        destination: document.getElementById('appDestination').value,
+        arrivalDate: document.getElementById('appArrivalDate').value || '—',
+        stayDays: document.getElementById('appStayDays').value || '15',
+        sponsor: document.getElementById('appSponsor').value.trim() || '—',
+        purpose: document.getElementById('appPurpose').value.trim() || '—'
+      };
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><span class="text-xs text-slate-500 block">Full Name</span><strong class="text-slate-900">${escapeHtml(data.fullName)}</strong></div>
+          <div><span class="text-xs text-slate-500 block">Email</span><strong class="text-slate-900">${escapeHtml(data.email)}</strong></div>
+          <div><span class="text-xs text-slate-500 block">Nationality</span><strong class="text-slate-900">${escapeHtml(data.nationality)}</strong></div>
+          <div><span class="text-xs text-slate-500 block">Passport Number</span><strong class="font-mono-code text-civic-800">${escapeHtml(data.passportNo)}</strong></div>
+          <div><span class="text-xs text-slate-500 block">Visa Category</span><strong class="text-civic-950">${visaInfo.title} ($${visaInfo.feeUsd} USD)</strong></div>
+          <div><span class="text-xs text-slate-500 block">Destination &amp; Arrival</span><strong class="text-slate-900">${escapeHtml(data.destination)} • ${escapeHtml(data.arrivalDate)} (${escapeHtml(data.stayDays)}d)</strong></div>
+          <div class="sm:col-span-2"><span class="text-xs text-slate-500 block">Sponsor / Host</span><strong class="text-slate-900">${escapeHtml(data.sponsor)}</strong></div>
+          <div class="sm:col-span-2"><span class="text-xs text-slate-500 block">Purpose</span><p class="text-slate-800 text-xs mt-0.5">${escapeHtml(data.purpose)}</p></div>
+        </div>
+        <div class="pt-3 border-t border-slate-200 flex flex-wrap gap-2 text-xs">
+          <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200">Passport: <strong>${state.uploads.passport ? escapeHtml(state.uploads.passport.name) : 'OCR Verified'}</strong></span>
+          <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200">Photo: <strong>${state.uploads.photo ? escapeHtml(state.uploads.photo.name) : 'Pending Attachment'}</strong></span>
+          <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200">Supporting: <strong>${state.uploads.supporting ? escapeHtml(state.uploads.supporting.name) : 'Pending Attachment'}</strong></span>
+        </div>
+      `;
+    }
+
+    function submitEvisaApplication(e) {
+      e.preventDefault();
+      const agreed = document.getElementById('appDeclaration').checked;
+      setFieldError('appDeclaration', !agreed);
+      if (!agreed) {
+        showToast('Please check the declaration box to submit your application.', 'warning');
+        return;
+      }
+
+      const visaInfo = VISA_TYPES[state.selectedVisaType] || VISA_TYPES.Tourist;
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      const appId = `EV-2026-${randomNum}`;
+      const nowStr = new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+      const fullName = document.getElementById('appFullName').value.trim();
+      const passportNo = document.getElementById('appPassportNo').value.trim().toUpperCase();
+      const nationality = document.getElementById('appNationality').value.trim();
+      const dob = document.getElementById('appDob').value;
+      const passportExpiry = document.getElementById('appPassportExpiry').value;
+
+      const newApp = {
+        id: appId,
+        fullName,
+        email: document.getElementById('appEmail').value.trim(),
+        nationality,
+        passportNo,
+        dob,
+        passportExpiry,
+        residence: document.getElementById('appResidence').value.trim(),
+        visaType: state.selectedVisaType,
+        destination: document.getElementById('appDestination').value,
+        arrivalDate: document.getElementById('appArrivalDate').value,
+        stayDays: Number(document.getElementById('appStayDays').value) || 15,
+        sponsor: document.getElementById('appSponsor').value.trim(),
+        purpose: document.getElementById('appPurpose').value.trim(),
+        feeUsd: visaInfo.feeUsd,
+        status: 'Pending',
+        createdAt: nowStr,
+        officerNotes: 'Application received. Awaiting initial consular officer review.',
+        documents: {
+          passport: state.uploads.passport?.name || 'passport_scan.jpg',
+          photo: state.uploads.photo?.name || 'applicant_photo.jpg',
+          supporting: state.uploads.supporting?.name || 'supporting_doc.pdf'
+        },
+        ocr: state.ocrData || {
+          fullName: fullName.toUpperCase(),
+          passportNo,
+          nationality: nationality.toUpperCase(),
+          dob,
+          expiry: passportExpiry,
+          confidence: '97.5%',
+          mrz: `P<${nationality.slice(0, 3).toUpperCase()}${fullName.split(' ').slice(-1)[0].toUpperCase()}<<<<<<<<<<<<<<<<<<<<<<<<`
+        },
+        timeline: [
+          {
+            stage: 'Application Submitted',
+            date: nowStr,
+            note: `${visaInfo.title} application ${appId} submitted ($${visaInfo.feeUsd} USD).`
+          },
+          {
+            stage: 'OCR & Document Check',
+            date: nowStr,
+            note: `Passport & document records logged (${state.ocrData ? state.ocrData.confidence : '97.5%'} OCR match).`
+          }
+        ]
+      };
+
+      state.applications.unshift(newApp);
+      state.selectedTrackId = appId;
+      state.formStep = 1;
+      state.uploads = { passport: null, photo: null, supporting: null };
+      state.ocrData = null;
+      document.getElementById('evisaForm').reset();
+      saveState();
+
+      showToast(`Application ${appId} submitted! Redirecting to live tracker...`, 'success');
+      switchView('track');
+    }
+
+    // -----------------------------------------------------------------------
+    // 7. APPLICATION TRACKING & TIMELINE
+    // -----------------------------------------------------------------------
+    function handleTrackSearchSubmit(e) {
+      e.preventDefault();
+      const inputVal = document.getElementById('trackSearchInput').value.trim().toUpperCase();
+      if (!inputVal) {
+        showToast('Enter an Application ID to search.', 'warning');
+        return;
+      }
+      state.selectedTrackId = inputVal;
+      saveState();
+      renderTrackingView(inputVal);
+    }
+
+    function getStatusBadgeClasses(status) {
+      switch (status) {
+        case 'Approved':
+          return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+        case 'Rejected':
+          return 'bg-rose-100 text-rose-800 border-rose-300';
+        case 'Under Review':
+          return 'bg-amber-100 text-amber-900 border-amber-300';
+        default:
+          return 'bg-sky-100 text-sky-900 border-sky-300';
+      }
+    }
+
+    function renderTrackingView(targetId) {
+      const input = document.getElementById('trackSearchInput');
+      if (input) input.value = targetId || '';
+
+      const quickContainer = document.getElementById('trackQuickButtons');
+      if (quickContainer) {
+        quickContainer.innerHTML = state.applications.map(a => `
+          <button type="button" onclick="selectTrackId('${a.id}')" class="px-3 py-1.5 rounded-lg text-xs font-mono-code font-semibold border transition ${
+            a.id === targetId
+              ? 'bg-civic-900 text-white border-civic-900'
+              : 'bg-slate-50 hover:bg-civic-50 text-slate-700 border-slate-200'
+          }">
+            ${a.id} • ${a.status}
+          </button>
+        `).join('');
+      }
+
+      const container = document.getElementById('trackingResultContainer');
+      if (!container) return;
+
+      const app = state.applications.find(a => a.id.toUpperCase() === (targetId || '').toUpperCase());
+      if (!app) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm">
+            <div class="text-lg font-bold text-slate-900">No Application Found for "${escapeHtml(targetId)}"</div>
+            <p class="text-sm text-slate-600 mt-1">Check the ID format (e.g., <span class="font-mono-code">EV-2026-8492</span>) or click one of the quick-load buttons above.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const visaInfo = VISA_TYPES[app.visaType] || VISA_TYPES.Tourist;
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Left Status & Details Card (7 cols) -->
+          <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-5">
+            <div class="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-slate-100">
+              <div>
+                <div class="text-xs font-mono-code text-slate-500">APPLICATION ID</div>
+                <div class="text-2xl font-extrabold font-mono-code text-civic-950">${escapeHtml(app.id)}</div>
+                <div class="text-xs text-slate-500 mt-0.5">Submitted on ${escapeHtml(app.createdAt)}</div>
+              </div>
+              <span class="px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wide border ${getStatusBadgeClasses(app.status)}">
+                ${escapeHtml(app.status)}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span class="text-xs text-slate-500 block">Applicant Name</span>
+                <strong class="text-slate-900">${escapeHtml(app.fullName)}</strong>
+              </div>
+              <div>
+                <span class="text-xs text-slate-500 block">Passport Number</span>
+                <strong class="font-mono-code text-slate-900">${escapeHtml(app.passportNo)} (${escapeHtml(app.nationality)})</strong>
+              </div>
+              <div>
+                <span class="text-xs text-slate-500 block">Visa Category</span>
+                <strong class="text-civic-800">${visaInfo.title}</strong>
+              </div>
+              <div>
+                <span class="text-xs text-slate-500 block">Destination &amp; Arrival</span>
+                <strong class="text-slate-900">${escapeHtml(app.destination)} • ${escapeHtml(app.arrivalDate)}</strong>
+              </div>
+              <div class="sm:col-span-2">
+                <span class="text-xs text-slate-500 block">Sponsor / Accommodation</span>
+                <strong class="text-slate-900">${escapeHtml(app.sponsor)}</strong>
+              </div>
+            </div>
+
+            <!-- Consular Officer Remarks -->
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Latest Officer / System Remark</div>
+              <p class="text-sm text-slate-800">${escapeHtml(app.officerNotes || 'No remarks recorded yet.')}</p>
+            </div>
+
+            <!-- Approved E-Visa Pass Summary -->
+            ${app.status === 'Approved' ? `
+              <div class="p-5 rounded-2xl bg-gradient-to-r from-emerald-900 to-civic-900 text-white border border-emerald-500/30 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-mono-code uppercase tracking-widest text-emerald-300">Official Electronic Visa Grant</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-400/20 text-emerald-200 text-xs font-bold">VALID</span>
+                </div>
+                <div class="text-lg font-extrabold">${escapeHtml(app.fullName)} — ${visaInfo.title}</div>
+                <div class="grid grid-cols-2 gap-2 text-xs text-slate-200 font-mono-code">
+                  <div>Pass No: ${escapeHtml(app.passportNo)}</div>
+                  <div>Validity: ${escapeHtml(visaInfo.validity.split(' (')[0])}</div>
+                </div>
+                <button type="button" onclick="window.print()" class="mt-2 px-4 py-2 rounded-xl bg-white text-civic-950 hover:bg-slate-100 text-xs font-bold transition no-print">
+                  Print / Save E-Visa Summary
+                </button>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Right Vertical Timeline (5 cols) -->
+          <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+            <h2 class="font-bold text-base text-civic-950 mb-4">Application History &amp; Timeline</h2>
+            <ol class="relative border-l-2 border-civic-200 ml-3 space-y-6">
+              ${app.timeline.map((item, index) => {
+                const isLatest = index === app.timeline.length - 1;
+                return `
+                  <li class="ml-5">
+                    <span class="absolute -left-[9px] flex h-4 w-4 items-center justify-center rounded-full ring-4 ring-white ${
+                      isLatest ? 'bg-civic-600' : 'bg-slate-300'
+                    }"></span>
+                    <div class="flex flex-wrap items-center justify-between gap-1">
+                      <h3 class="text-sm font-bold text-civic-950">${escapeHtml(item.stage)}</h3>
+                      <span class="text-[11px] font-mono-code text-slate-400">${escapeHtml(item.date)}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">${escapeHtml(item.note)}</p>
+                  </li>
+                `;
+              }).join('')}
+            </ol>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectTrackId(id) {
+      state.selectedTrackId = id;
+      saveState();
+      renderTrackingView(id);
+    }
+
+    // -----------------------------------------------------------------------
+    // 8. IMMIGRATION ADMIN DASHBOARD, CHARTS & ADJUDICATION MODAL
+    // -----------------------------------------------------------------------
+    function renderAdminDashboard() {
+      renderAdminKpis();
+      renderAdminCharts();
+      renderAdminTable();
+    }
+
+    function renderAdminKpis() {
+      const apps = state.applications;
+      const total = apps.length;
+      const pendingOrReview = apps.filter(a => a.status === 'Pending' || a.status === 'Under Review').length;
+      const approved = apps.filter(a => a.status === 'Approved').length;
+      const rejected = apps.filter(a => a.status === 'Rejected').length;
+
+      const kpis = [
+        { label: 'Total Applications', value: total, sub: 'All visa categories', color: 'text-civic-950' },
+        { label: 'Pending / Review', value: pendingOrReview, sub: 'Awaiting adjudication', color: 'text-amber-700' },
+        { label: 'Approved', value: approved, sub: 'E-Visa granted', color: 'text-emerald-700' },
+        { label: 'Rejected', value: rejected, sub: 'Refused / re-apply', color: 'text-rose-700' },
+        { label: 'Avg. Turnaround', value: '36 hrs', sub: 'OCR fast-track active', color: 'text-civic-700' }
+      ];
+
+      document.getElementById('adminKpiGrid').innerHTML = kpis.map(k => `
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500">${k.label}</div>
+          <div class="text-2xl sm:text-3xl font-extrabold mt-1 ${k.color}">${k.value}</div>
+          <div class="text-[11px] text-slate-400 mt-1">${k.sub}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderAdminCharts() {
+      if (typeof Chart === 'undefined') return;
+      const apps = state.applications;
+
+      // Chart 1: Applications by Visa Category
+      const visaCounts = ['Tourist', 'Student', 'Business', 'Medical'].map(
+        type => apps.filter(a => a.visaType === type).length
+      );
+
+      const ctx1 = document.getElementById('visaCategoryChart')?.getContext('2d');
+      if (ctx1) {
+        if (visaChartInstance) visaChartInstance.destroy();
+        visaChartInstance = new Chart(ctx1, {
+          type: 'bar',
+          data: {
+            labels: ['Tourist', 'Student', 'Business', 'Medical'],
+            datasets: [{
+              label: 'Applications',
+              data: visaCounts,
+              backgroundColor: ['#0ea5e9', '#6366f1', '#8b5cf6', '#f43f5e'],
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+          }
+        });
+      }
+
+      // Chart 2: Status Breakdown (Doughnut)
+      const statusCounts = ['Pending', 'Under Review', 'Approved', 'Rejected'].map(
+        st => apps.filter(a => a.status === st).length
+      );
+
+      const ctx2 = document.getElementById('statusBreakdownChart')?.getContext('2d');
+      if (ctx2) {
+        if (statusChartInstance) statusChartInstance.destroy();
+        statusChartInstance = new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: ['Pending', 'Under Review', 'Approved', 'Rejected'],
+            datasets: [{
+              data: statusCounts,
+              backgroundColor: ['#38bdf8', '#f59e0b', '#10b981', '#ef4444'],
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'right' }
+            }
+          }
+        });
+      }
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('adminTableBody');
+      if (!tbody) return;
+
+      const q = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
+      const stFilter = document.getElementById('adminStatusFilter')?.value || 'ALL';
+      const tpFilter = document.getElementById('adminTypeFilter')?.value || 'ALL';
+
+      const filtered = state.applications.filter(app => {
+        const matchesQuery =
+          !q ||
+          app.id.toLowerCase().includes(q) ||
+          app.fullName.toLowerCase().includes(q) ||
+          app.passportNo.toLowerCase().includes(q) ||
+          app.destination.toLowerCase().includes(q);
+        const matchesStatus = stFilter === 'ALL' || app.status === stFilter;
+        const matchesType = tpFilter === 'ALL' || app.visaType === tpFilter;
+        return matchesQuery && matchesStatus && matchesType;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 text-sm">No matching applications found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(app => `
+        <tr class="hover:bg-slate-50/80 transition">
+          <td class="py-3.5 px-4 font-mono-code font-bold text-xs text-civic-900 whitespace-nowrap">${escapeHtml(app.id)}</td>
+          <td class="py-3.5 px-4">
+            <div class="font-semibold text-slate-900">${escapeHtml(app.fullName)}</div>
+            <div class="text-xs font-mono-code text-slate-500">${escapeHtml(app.passportNo)} • ${escapeHtml(app.nationality)}</div>
+          </td>
+          <td class="py-3.5 px-4 text-xs font-semibold text-slate-700 whitespace-nowrap">${escapeHtml(app.visaType)}</td>
+          <td class="py-3.5 px-4 text-xs text-slate-700 whitespace-nowrap">${escapeHtml(app.destination)}</td>
+          <td class="py-3.5 px-4 font-mono-code text-xs text-emerald-700 font-semibold whitespace-nowrap">${escapeHtml(app.ocr?.confidence || '98.0%')}</td>
+          <td class="py-3.5 px-4 whitespace-nowrap">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border ${getStatusBadgeClasses(app.status)}">
+              ${escapeHtml(app.status)}
+            </span>
+          </td>
+          <td class="py-3.5 px-4 text-right whitespace-nowrap">
+            <button onclick="openAdminInspectModal('${app.id}')" class="px-3 py-1.5 rounded-lg bg-civic-900 hover:bg-civic-800 text-white text-xs font-semibold transition">
+              Inspect / Review
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openAdminInspectModal(appId) {
+      const app = state.applications.find(a => a.id === appId);
+      if (!app) return;
+
+      const content = document.getElementById('adminInspectContent');
+      content.innerHTML = `
+        <div class="pr-8 pb-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="text-xs font-mono-code text-slate-500">CONSULAR DOSSIER</span>
+            <h2 class="text-xl font-extrabold font-mono-code text-civic-950">${escapeHtml(app.id)} — ${escapeHtml(app.fullName)}</h2>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadgeClasses(app.status)}">${escapeHtml(app.status)}</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-5 text-sm">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Applicant &amp; Travel</div>
+            <div><span class="text-slate-500">Nationality:</span> <strong>${escapeHtml(app.nationality)}</strong></div>
+            <div><span class="text-slate-500">Passport:</span> <strong class="font-mono-code">${escapeHtml(app.passportNo)}</strong> (Exp: ${escapeHtml(app.passportExpiry)})</div>
+            <div><span class="text-slate-500">Visa Class:</span> <strong>${escapeHtml(app.visaType)} ($${app.feeUsd})</strong></div>
+            <div><span class="text-slate-500">Destination:</span> <strong>${escapeHtml(app.destination)}</strong> (Arr: ${escapeHtml(app.arrivalDate)})</div>
+            <div><span class="text-slate-500">Sponsor:</span> <strong>${escapeHtml(app.sponsor)}</strong></div>
+            <div class="pt-1 text-xs text-slate-600"><strong>Purpose:</strong> ${escapeHtml(app.purpose)}</div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-civic-950 text-white space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono-code uppercase text-sky-300">OCR Extraction &amp; Files</span>
+              <span class="text-xs font-mono-code text-emerald-300">${escapeHtml(app.ocr?.confidence || '98.0%')}</span>
+            </div>
+            <div class="text-xs font-mono-code space-y-1 text-slate-200">
+              <div>OCR Name: <span class="text-white">${escapeHtml(app.ocr?.fullName || app.fullName.toUpperCase())}</span></div>
+              <div>OCR Pass: <span class="text-sky-300">${escapeHtml(app.ocr?.passportNo || app.passportNo)}</span></div>
+              <div>MRZ: <span class="text-amber-300 break-all">${escapeHtml(app.ocr?.mrz || 'N/A')}</span></div>
+            </div>
+            <div class="pt-2 border-t border-white/10 text-xs space-y-1 text-slate-300">
+              <div>📄 Passport: <span class="font-mono-code text-white">${escapeHtml(app.documents?.passport || 'passport.jpg')}</span></div>
+              <div>🖼️ Photo: <span class="font-mono-code text-white">${escapeHtml(app.documents?.photo || 'photo.jpg')}</span></div>
+              <div>📎 Supporting: <span class="font-mono-code text-white">${escapeHtml(app.documents?.supporting || 'supporting.pdf')}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <label for="adminOfficerRemarks" class="block text-xs font-bold uppercase tracking-wider text-slate-600">Officer Adjudication Remarks</label>
+          <textarea id="adminOfficerRemarks" rows="2" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-civic-500 outline-none">${escapeHtml(app.officerNotes || '')}</textarea>
+
+          <div class="flex flex-wrap items-center justify-end gap-2.5 pt-2">
+            <button type="button" onclick="adjudicateApplication('${app.id}', 'Under Review')" class="px-4 py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 text-xs sm:text-sm font-bold transition">
+              Move to Under Review
+            </button>
+            <button type="button" onclick="adjudicateApplication('${app.id}', 'Rejected')" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-bold transition">
+              Reject Application
+            </button>
+            <button type="button" onclick="adjudicateApplication('${app.id}', 'Approved')" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold shadow transition">
+              Approve E-Visa
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('adminInspectModal').classList.remove('hidden');
+    }
+
+    function closeAdminInspectModal() {
+      document.getElementById('adminInspectModal').classList.add('hidden');
+    }
+
+    function adjudicateApplication(appId, newStatus) {
+      const app = state.applications.find(a => a.id === appId);
+      if (!app) return;
+
+      const remarks = document.getElementById('adminOfficerRemarks')?.value.trim() || `Status updated to ${newStatus} by consular officer.`;
+      const nowStr = new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+      app.status = newStatus;
+      app.officerNotes = remarks;
+      app.timeline.push({
+        stage: newStatus,
+        date: nowStr,
+        note: `${remarks} (Officer: ${state.currentUser?.name || 'Consular Officer'})`
+      });
+
+      state.selectedTrackId = appId;
+      saveState();
+      closeAdminInspectModal();
+      renderAdminDashboard();
+      showToast(`Application ${appId} marked as ${newStatus}.`, newStatus === 'Approved' ? 'success' : newStatus === 'Rejected' ? 'error' : 'info');
+    }
+
+    function exportApplicationsCsv() {
+      const headers = ['Application ID', 'Full Name', 'Nationality', 'Passport No', 'Visa Type', 'Destination', 'Status', 'Fee USD', 'Created At'];
+      const rows = state.applications.map(a => [
+        a.id, a.fullName, a.nationality, a.passportNo, a.visaType, a.destination, a.status, a.feeUsd, a.createdAt
+      ]);
+      const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'evisa_applications_report.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast('Exported applications CSV report.', 'success');
+    }
+
+    function resetDemoData() {
+      state.applications = JSON.parse(JSON.stringify(INITIAL_APPLICATIONS));
+      state.selectedTrackId = 'EV-2026-8492';
+      saveState();
+      renderAdminDashboard();
+      showToast('Restored initial sample applications queue.', 'info');
+    }
+
+    // -----------------------------------------------------------------------
+    // 9. AI VISA ASSISTANT CHATBOT
+    // -----------------------------------------------------------------------
+    function renderChatMessages() {
+      const container = document.getElementById('chatMessagesContainer');
+      if (!container) return;
+
+      container.innerHTML = state.chatHistory.map(msg => {
+        const isAi = msg.sender === 'ai';
+        const formatted = escapeHtml(msg.text)
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\n/g, '<br />');
+
+        return `
+          <div class="flex ${isAi ? 'justify-start' : 'justify-end'}">
+            <div class="max-w-[88%] sm:max-w-[78%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed shadow-xs ${
+              isAi
+                ? 'bg-white text-slate-800 border border-slate-200 rounded-tl-xs'
+                : 'bg-civic-900 text-white rounded-tr-xs'
+            }">
+              ${formatted}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      sendAssistantPrompt(text);
+    }
+
+    function sendAssistantPrompt(promptText) {
+      state.chatHistory.push({ sender: 'user', text: promptText });
+      const reply = generateAssistantReply(promptText);
+      state.chatHistory.push({ sender: 'ai', text: reply });
+      saveState();
+      renderChatMessages();
+    }
+
+    function generateAssistantReply(query) {
+      const q = query.toLowerCase();
+
+      // Check country matches first
+      for (const [key, c] of Object.entries(COUNTRY_INFO_DB)) {
+        if (q.includes(key) || (key === 'schengen' && (q.includes('eu') || q.includes('europe')))) {
+          return `${c.flag} **${c.name} Entry & Visa Guidance**\n• **Entry Rules:** ${c.entry}\n• **Passport Validity:** ${c.validity}\n• **Consular Tip:** ${c.tip}`;
+        }
+      }
+
+      if (q.includes('student') || q.includes('medical')) {
+        return `🎓 **Student & 🏥 Medical E-Visa Checklists**\n• **Student ($160, 365 days):** Valid passport (6+ months), university admission/enrollment letter, financial/tuition proof, academic records.\n• **Medical ($95, 180 days):** Valid passport, accredited hospital appointment/treatment letter, home physician medical report, medical funding proof.`;
+      }
+
+      if (q.includes('tourist') || q.includes('business') || q.includes('checklist') || q.includes('document')) {
+        return `🧳 **Tourist ($80) & 💼 Business ($140) Document Checklist**\n1. **Passport Bio Page** (6+ months validity & 2 blank pages)\n2. **Applicant Photo** (clear light background)\n3. **Purpose Proof:** Flight/hotel itinerary (Tourist) or company invitation/conference letter (Business)\n4. **OCR Scan:** Run our Step 3 OCR scanner to verify passport MRZ fields automatically.`;
+      }
+
+      if (q.includes('track') || q.includes('status') || q.includes('process') || q.includes('long') || q.includes('fee')) {
+        return `⏱️ **Processing Times, Fees & Tracking**\n• **Typical Turnaround:** Medical (12–24h), Tourist (24–72h), Business (24–48h), Student (3–5 business days).\n• **Statuses:** *Pending* → *Under Review* → *Approved* or *Rejected*.\n• Use your **Application ID** (e.g., \`EV-2026-8492\`) in the **Track Application** tab to view live timeline notes.`;
+      }
+
+      return `🤖 **Consular AI Guidance**\nI can help you with:\n• **Visa Categories:** Tourist ($80), Student ($160), Business ($140), Medical ($95)\n• **Countries:** USA, UK, Schengen (EU), India, UAE, Canada, Japan\n• **Document Checklists & OCR:** Required files and passport validity rules\n• **Tracking:** Checking status by Application ID\n\nTry asking: *"What documents do I need for a Student visa?"* or *"Tell me about Schengen visa rules."*`;
+    }
+
+    function clearChatHistory() {
+      state.chatHistory = [
+        {
+          sender: 'ai',
+          text: 'Chat history cleared. How can I assist you with your E-Visa application today?'
+        }
+      ];
+      saveState();
+      renderChatMessages();
+    }
+
+    // -----------------------------------------------------------------------
+    // 10. INITIALIZATION ON WINDOW LOAD
+    // -----------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      updateSessionUI();
+      switchView(state.currentView || 'home');
+    });
+  </script>
+</body>
+</html>
